@@ -1,54 +1,54 @@
-#include "flat_set.h"
+#include "vector.h"
 
-#define FLAT_SET_INITIAL_SIZE 16
-#define FLAT_SET_GROWTH_FACTOR 2
+#define VECTOR_INITIAL_SIZE 16
+#define VECTOR_GROWTH_FACTOR 2
 
-flat_set *fset_constructor(size_t smemb, compar_fn compar, copy_fn copy,
+vector *vector_constructor(size_t smemb, compar_fn compar, copy_fn copy,
                            destruct_fn destruct) {
-    flat_set *fset = malloc(sizeof *fset);
+    vector *vector = malloc(sizeof *vector);
 
-    fset->smemb = smemb;
+    vector->smemb = smemb;
 
-    fset->compar = compar;
-    fset->copy = copy;
-    fset->destruct = destruct;
+    vector->compar = compar;
+    vector->copy = copy;
+    vector->destruct = destruct;
 
-    fset->size = FLAT_SET_INITIAL_SIZE;
-    fset->len = 0;
-    fset->arr = malloc(fset->size * smemb);
+    vector->size = VECTOR_INITIAL_SIZE;
+    vector->len = 0;
+    vector->arr = malloc(vector->size * smemb);
 
-    return fset;
+    return vector;
 }
 
-size_t fset_length(flat_set *fset) { return fset->len; }
+size_t vector_length(vector *vector) { return vector->len; }
 
-void *fset_index(flat_set *fset, size_t idx) {
-    return fset->arr[idx * fset->smemb];
+void *vector_index(vector *vector, size_t idx) {
+    return vector->arr[idx * vector->smemb];
 }
 
-size_t fset_iterator_begin(flat_set *fset) { return 0; }
+size_t vector_iterator_begin(vector *vector) { return 0; }
 
-void *fset_iterator_next(flat_set *fset, size_t *saveptr) {
-    void *curr = fset_index(fset, *saveptr);
+void *vector_iterator_next(vector *vector, size_t *saveptr) {
+    void *curr = vector_index(vector, *saveptr);
 
     *saveptr++;
 
     return curr;
 }
 
-bool fset_iterator_has_next(flat_set *fset, size_t *saveptr) {
-    return fset_length(fset) > *saveptr;
+bool vector_iterator_has_next(vector *vector, size_t *saveptr) {
+    return vector_length(vector) > *saveptr;
 }
 
-void fset_destructor(flat_set *fset) {
-    size_t it = fset_iterator_begin(fset);
-    while (fset_iterator_has_next(fset, &it)) {
-        void *curr = fset_iterator_next(fset, &it);
+void vector_destructor(vector *vector) {
+    size_t it = vector_iterator_begin(vector);
+    while (vector_iterator_has_next(vector, &it)) {
+        void *curr = vector_iterator_next(vector, &it);
 
-        fset->destruct(curr);
+        vector->destruct(curr);
     }
 
-    free(fset->arr);
+    free(vector->arr);
 
-    free(fset);
+    free(vector);
 }
