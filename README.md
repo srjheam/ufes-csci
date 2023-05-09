@@ -1,5 +1,5 @@
 <div align="center">
-  <h3 align="center">C Sci</h3>
+  <h3 align="center">csci</h3>
 </div>
 
 ## License
