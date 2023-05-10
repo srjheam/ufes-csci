@@ -23,7 +23,9 @@ size_t vector_length(vector *vector);
 
 void *vector_index(vector *vector, size_t idx);
 
-void vector_push(vector *vector, void *elem);
+void vector_insert(vector *vector, void *elem);
+
+void vector_erase(vector *vector, int i);
 
 size_t vector_iterator_begin(vector *vector);
 
