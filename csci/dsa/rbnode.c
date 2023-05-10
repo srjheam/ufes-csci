@@ -35,6 +35,20 @@ void *rbnode_setright(rbnode *node, rbnode *nright) {
     return sr;
 }
 
+void rbnode_rotateleft(rbnode *root) {
+    if (root == NULL || root->right == NULL)
+        return;
+
+    rbnode *right = root->right;
+    
+}
+
+void rbnode_rotateright(rbnode *root) {
+    if (root == NULL || root->left == NULL)
+        return;
+
+}
+
 void rbnode_destructor(rbnode *node) {
     free(node->key);
 
