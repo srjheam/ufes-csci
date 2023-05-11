@@ -6,7 +6,7 @@
 enum color_t { BLACK, RED };
 
 typedef struct rbnode {
-    byte *key;
+    void *key;
 
     struct rbnode *parent;
     struct rbnode *left;
@@ -15,8 +15,8 @@ typedef struct rbnode {
     enum color_t color;
 } rbnode;
 
-rbnode *rbnode_constructor(size_t smemb, void *key, rbnode *parent,
-                           rbnode *left, rbnode *right, enum color_t color);
+rbnode *rbnode_constructor(void *key, rbnode *parent, rbnode *left,
+                           rbnode *right, enum color_t color);
 
 void rbnode_rotateleft(rbnode *root);
 
@@ -26,6 +26,8 @@ void rbnode_rotateleftright(rbnode *root);
 
 void rbnode_rotaterightleft(rbnode *root);
 
-void rbnode_destructor(rbnode *node);
+void rbnode_clear(rbnode *root, destruct_fn destructor);
+
+void rbnode_destructor(rbnode *node, destruct_fn destructor);
 
 #endif

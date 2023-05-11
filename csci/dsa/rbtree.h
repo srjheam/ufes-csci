@@ -6,19 +6,20 @@
 typedef struct rbtree {
     rbnode *root;
 
-    compar_fn compar;
-
-    size_t smemb;
+    compar_fn comparer;
+    destruct_fn destructor;
 } rbtree;
 
-rbtree *rbtree_constructor(size_t smemb, compar_fn compar);
+rbtree *rbtree_constructor(compar_fn compar, destruct_fn destructor);
 
 void rbtree_insert(rbtree *tree, void *key);
 
 void rbtree_remove(rbtree *tree, void *key);
 
-void rbtree_lookup(rbtree *tree, void *key, void *out, void *dft);
+void *rbtree_lookup(rbtree *tree, void *key);
 
-rbtree *rbtree_destructor(rbtree *tree);
+void rbtree_clear(rbtree *tree);
+
+void rbtree_destructor(rbtree *tree);
 
 #endif

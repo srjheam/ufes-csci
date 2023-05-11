@@ -1,11 +1,10 @@
 #include "rbnode.h"
 
-rbnode *rbnode_constructor(size_t smemb, void *key, rbnode *parent,
-                           rbnode *left, rbnode *right, enum color_t color) {
+rbnode *rbnode_constructor(void *key, rbnode *parent, rbnode *left,
+                           rbnode *right, enum color_t color) {
     rbnode *node = malloc(sizeof *node);
 
-    node->key = malloc(smemb);
-    memcpy(node->key, key, smemb);
+    node->key = key;
 
     node->parent = parent;
 
@@ -79,8 +78,19 @@ void rbnode_rotaterightleft(rbnode *root) {
     rbnode_rotateleft(root);
 }
 
-void rbnode_destructor(rbnode *node) {
-    free(node->key);
+void rbnode_clear(rbnode *root, destruct_fn destructor) {
+    if (root == NULL)
+        return;
+
+    rbnode_clear(root->left, destructor);
+    rbnode_clear(root->right, destructor);
+
+    rbnode_destructor(root, destructor);
+}
+
+void rbnode_destructor(rbnode *node, destruct_fn destructor) {
+    if (destructor != NULL)
+        destructor(node->key);
 
     free(node);
 }

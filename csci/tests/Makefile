@@ -2,19 +2,20 @@
 
 # INCLUDE        - é o diretório que contém os headers
 # BUILDIR        - é o diretório onde estarão os binários
-# LIBCOMMONDIR   - é o diretório para a biblioteca de tipos comuns.
-# LIBCOMMON      - é a biblioteca de tipos comuns.
-INCLUDE          = include
-LIBCOMMONDIR     = common
-LIBCOMMONINCLUDE = $(LIBCOMMONDIR)/include
-LIBCOMMON        = common
-MAIN             = main
-VALGRINDOUT      = valgrind-out.txt
+# LIBDSADIR   - é o diretório para a biblioteca de tipos comuns.
+# LIBDSA      - é a biblioteca de tipos comuns.
+INCLUDE          = .
+LIBDSADIR     = ../dsa
+LIBDSAINCLUDE = $(LIBDSADIR)
+LIBDSA        = dsa
+LIBDSAAR      = $(LIBDSADIR)/lib$(LIBDSA).a
+MAIN          = main
+VALGRINDOUT   = valgrind-out.txt
 
 # CCompiler - é o compilador usado
 # CFLAGS    - são as flags dadas ao compilador durante a compilação
 CC = gcc
-override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBCOMMONINCLUDE) -I$(LIBENGINEINCLUDE) -lm
+override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBDSAINCLUDE) -I$(LIBENGINEINCLUDE) -lm
 
 # Make - é o GNU Make
 MAKE = make
@@ -22,27 +23,19 @@ MAKE = make
 all : pre-build build
 
 # Compila o executável e linka as bibliotecas
-nlindexa: nlindexa.c
-	$(CC) -o $@ $< -L $(LIBENGINEDIR)/ -l$(LIBENGINE) -L $(LIBCOMMONDIR)/ -l$(LIBCOMMON) $(CFLAGS)
-
-nlbusca: nlbusca.c
-	$(CC) -o $@ $< -L $(LIBENGINEDIR)/ -l$(LIBENGINE) -L $(LIBCOMMONDIR)/ -l$(LIBCOMMON) $(CFLAGS)
-
-nltesta: nltesta.c
-	$(CC) -o $@ $< -L $(LIBENGINEDIR)/ -l$(LIBENGINE) -L $(LIBCOMMONDIR)/ -l$(LIBCOMMON) $(CFLAGS)
+main: main.c $(LIBDSAAR)
+	$(CC) -o $@ $< -L $(LIBDSADIR)/ -l$(LIBDSA) $(CFLAGS)
 
 # Chama os submakefiles garantindo a compilação das bibliotecas
 pre-build:
-	$(MAKE) -C $(LIBCOMMONDIR)/
-	$(MAKE) -C $(LIBENGINEDIR)/ 
+	$(MAKE) -C $(LIBDSADIR)/
 
-build : nlindexa nlbusca nltesta
+build : main
 
 # Rode make clean para remover tudo que é gerado pela build
 clean:
-	rm -f nlindexa nlbusca nltesta $(VALGRINDOUT)
-	$(MAKE) -C $(LIBCOMMONDIR)/ clean
-	$(MAKE) -C $(LIBENGINEDIR)/ clean
+	rm -f $(MAIN) $(VALGRINDOUT)
+	$(MAKE) -C $(LIBDSADIR)/ clean
 
 valgrind: all
 	rm -f $(VALGRINDOUT)
@@ -52,6 +45,6 @@ valgrind: all
 			 --track-origins=yes \
 			 --verbose \
 			 --log-file=$(VALGRINDOUT) \
-			 ./$(VALPROG) $(VALARGS)
+			 ./$(MAIN) $(VALARGS)
 
 	@echo "Head to $(VALGRINDOUT)"

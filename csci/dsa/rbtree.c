@@ -1,11 +1,10 @@
 #include "rbtree.h"
 
-rbtree *rbtree_constructor(size_t smemb, compar_fn compar) {
+rbtree *rbtree_constructor(compar_fn compar, destruct_fn destructor) {
     rbtree *tree = malloc(sizeof *tree);
 
-    tree->smemb = smemb;
-
-    tree->compar = compar;
+    tree->comparer = compar;
+    tree->destructor = destructor;
 
     tree->root = NULL;
 
@@ -14,14 +13,13 @@ rbtree *rbtree_constructor(size_t smemb, compar_fn compar) {
 
 void rbtree_insert(rbtree *tree, void *key) {
     if (tree->root == NULL) {
-        tree->root =
-            rbnode_constructor(tree->smemb, key, NULL, NULL, NULL, BLACK);
+        tree->root = rbnode_constructor(key, NULL, NULL, NULL, BLACK);
         return;
     }
 
     rbnode *root = tree->root;
     do {
-        int cmp = tree->compar(key, root);
+        int cmp = tree->comparer(key, root->key);
         if (cmp > 0) {
             if (root->right == NULL)
                 break;
@@ -29,23 +27,25 @@ void rbtree_insert(rbtree *tree, void *key) {
             break;
 
         root = cmp > 0 ? root->right : root->left;
-    } while (root != NULL);
+    } while (1);
 
-    rbnode *nnode =
-        rbnode_constructor(tree->smemb, root, NULL, NULL, NULL, RED);
+    rbnode *nnode = rbnode_constructor(key, root, NULL, NULL, RED);
 
-    int cmp = tree->compar(key, root);
+    int cmp = tree->comparer(key, root->key);
     if (cmp > 0)
         root->right = nnode;
     else
         root->left = nnode;
 
     // maintain
-    while (nnode->parent->color == RED) {
+    if (nnode->parent->color == BLACK)
+        return;
+
+    while (nnode->parent != NULL && nnode->parent->color == RED) {
         rbnode *parent = nnode->parent;
         rbnode *grandpa = parent->parent;
         if (parent == grandpa->left) {
-            if (grandpa->right != NULL && grandpa->right->color == RED) {
+            if (grandpa->right->color == RED) {
                 grandpa->right->color = BLACK;
                 grandpa->left->color = BLACK;
                 grandpa->color = RED;
@@ -94,18 +94,13 @@ void rbtree_insert(rbtree *tree, void *key) {
  *
  * @param tree The binary tree
  * @param key The key to look for
- * @param out Local where result will be stored
- * @param dft Default return value when no key is found
- *
- * @note dft parameter may be replaced with a function to allow the client to
- * raise an exception
  */
-void rbtree_lookup(rbtree *tree, void *key, void *out, void *dft) {
+void *rbtree_lookup(rbtree *tree, void *key) {
     rbnode *curr = tree->root;
     while (curr != NULL) {
-        int cmp = tree->compar(&key, &curr->key);
+        int cmp = tree->comparer(key, curr->key);
         if (cmp == 0)
-            memcpy(out, curr->key, tree->smemb);
+            return curr->key;
 
         if (curr->left == NULL || curr->right == NULL) {
             curr = curr->left == NULL ? curr->right : curr->left;
@@ -115,8 +110,15 @@ void rbtree_lookup(rbtree *tree, void *key, void *out, void *dft) {
         curr = cmp < 0 ? curr->left : curr->right;
     }
 
-    // errno
-    memcpy(out, dft, tree->smemb);
+    return NULL;
 }
 
-rbtree *rbtree_destructor(rbtree *tree);
+void rbtree_clear(rbtree *tree) {
+    rbnode_clear(tree->root, tree->destructor);
+    tree->root = NULL;
+}
+
+void rbtree_destructor(rbtree *tree) {
+    rbtree_clear(tree);
+    free(tree);
+}
