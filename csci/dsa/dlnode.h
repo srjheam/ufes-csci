@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-typedef struct {
+typedef struct dlnode {
     byte *data;
 
     struct dlnode *next;

@@ -4,7 +4,7 @@
 #include "common.h"
 #include "dlnode.h"
 
-typedef struct {
+typedef struct list {
     dlnode *head;
     dlnode *tail;
 

@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-typedef struct {
+typedef struct kvp {
     byte *key;
     byte *value;
 
