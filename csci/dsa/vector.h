@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-typedef struct {
+typedef struct vector {
     byte *arr;
 
     size_t len;
@@ -21,15 +21,15 @@ vector *vector_constructor(size_t smemb, compar_fn compar, copy_fn copy,
 
 size_t vector_length(vector *vector);
 
-void *vector_index(vector *vector, size_t idx);
+void vector_index(vector *vector, size_t idx, void *out);
 
 void vector_insert(vector *vector, void *elem);
 
 void vector_erase(vector *vector, int i);
 
-size_t vector_iterator_begin(vector *vector);
+size_t vector_iterator_begin();
 
-void *vector_iterator_next(vector *vector, size_t *saveptr);
+void vector_iterator_next(vector *vector, size_t *saveptr, void *out);
 
 bool vector_iterator_has_next(vector *vector, size_t *saveptr);
 

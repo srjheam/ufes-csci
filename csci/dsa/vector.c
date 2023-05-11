@@ -22,18 +22,15 @@ vector *vector_constructor(size_t smemb, compar_fn compar, copy_fn copy,
 
 size_t vector_length(vector *vector) { return vector->len; }
 
-void *vector_index(vector *vector, size_t idx) {
-    return vector->arr[idx * vector->smemb];
+void vector_index(vector *vector, size_t idx, void *out) {
+    memcpy(out, &vector->arr[idx * vector->smemb], vector->smemb);
 }
 
-size_t vector_iterator_begin(vector *vector) { return 0; }
+size_t vector_iterator_begin() { return 0; }
 
-void *vector_iterator_next(vector *vector, size_t *saveptr) {
-    void *curr = vector_index(vector, *saveptr);
-
-    *saveptr++;
-
-    return curr;
+void vector_iterator_next(vector *vector, size_t *saveptr, void *out) {
+    vector_index(vector, *saveptr, out);
+    *saveptr += 1;
 }
 
 bool vector_iterator_has_next(vector *vector, size_t *saveptr) {
@@ -42,8 +39,9 @@ bool vector_iterator_has_next(vector *vector, size_t *saveptr) {
 
 void vector_destructor(vector *vector) {
     size_t it = vector_iterator_begin(vector);
+    void *curr = malloc(vector->smemb);
     while (vector_iterator_has_next(vector, &it)) {
-        void *curr = vector_iterator_next(vector, &it);
+        vector_iterator_next(vector, &it, curr);
 
         vector->destruct(curr);
     }
