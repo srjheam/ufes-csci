@@ -29,12 +29,10 @@ void rbnode_rotateleft(rbnode *root) {
 
     if (root->parent == NULL) {
         oright->left = root;
-    }
-    else if (root->parent->left == root) {
+    } else if (root->parent->left == root) {
         root->parent->left = oright;
         oright->parent = root->parent;
-    }
-    else {
+    } else {
         root->parent->right = oright;
         oright->parent = root->parent;
     }
@@ -54,17 +52,31 @@ void rbnode_rotateright(rbnode *root) {
 
     if (root->parent == NULL) {
         oleft->right = root;
-    }
-    else if (root->parent->right == root) {
+    } else if (root->parent->right == root) {
         root->parent->right = oleft;
         oleft->parent = root->parent;
-    }
-    else {
+    } else {
         root->parent->right = oleft;
         oleft->parent = root->parent;
     }
 
     root->parent = oleft;
+}
+
+void rbnode_rotateleftright(rbnode *root) {
+    if (root == NULL)
+        return;
+
+    rbnode_rotateleft(root->left);
+    rbnode_rotateright(root);
+}
+
+void rbnode_rotaterightleft(rbnode *root) {
+    if (root == NULL)
+        return;
+
+    rbnode_rotateright(root->right);
+    rbnode_rotateleft(root);
 }
 
 void rbnode_destructor(rbnode *node) {

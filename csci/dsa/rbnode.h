@@ -22,6 +22,10 @@ void rbnode_rotateleft(rbnode *root);
 
 void rbnode_rotateright(rbnode *root);
 
+void rbnode_rotateleftright(rbnode *root);
+
+void rbnode_rotaterightleft(rbnode *root);
+
 void rbnode_destructor(rbnode *node);
 
 #endif
