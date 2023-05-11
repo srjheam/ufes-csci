@@ -17,36 +17,54 @@ rbnode *rbnode_constructor(size_t smemb, void *key, rbnode *parent,
     return node;
 }
 
-void *rbnode_setparent(rbnode *node, rbnode *nparent) {
-    rbnode *sp = node->parent;
-    node->parent = nparent;
-    return sp;
-}
-
-void *rbnode_setleft(rbnode *node, rbnode *nleft) {
-    rbnode *sl = node->right;
-    node->left = nleft;
-    return sl;
-}
-
-void *rbnode_setright(rbnode *node, rbnode *nright) {
-    rbnode *sr = node->right;
-    node->right = nright;
-    return sr;
-}
-
 void rbnode_rotateleft(rbnode *root) {
-    if (root == NULL || root->right == NULL)
+    if (root == NULL || root->right == NULL || root->right->left == NULL)
         return;
 
-    rbnode *right = root->right;
-    
+    rbnode *oright = root->right;
+
+    root->right = oright->left;
+    root->right->parent = root;
+    oright->parent = NULL;
+
+    if (root->parent == NULL) {
+        oright->left = root;
+    }
+    else if (root->parent->left == root) {
+        root->parent->left = oright;
+        oright->parent = root->parent;
+    }
+    else {
+        root->parent->right = oright;
+        oright->parent = root->parent;
+    }
+
+    root->parent = oright;
 }
 
 void rbnode_rotateright(rbnode *root) {
-    if (root == NULL || root->left == NULL)
+    if (root == NULL || root->left == NULL || root->left->right == NULL)
         return;
 
+    rbnode *oleft = root->left;
+
+    root->left = oleft->right;
+    root->left->parent = root;
+    oleft->parent = NULL;
+
+    if (root->parent == NULL) {
+        oleft->right = root;
+    }
+    else if (root->parent->right == root) {
+        root->parent->right = oleft;
+        oleft->parent = root->parent;
+    }
+    else {
+        root->parent->right = oleft;
+        oleft->parent = root->parent;
+    }
+
+    root->parent = oleft;
 }
 
 void rbnode_destructor(rbnode *node) {

@@ -5,7 +5,7 @@
 
 enum color_t { BLACK, RED };
 
-typedef struct {
+typedef struct rbnode {
     byte *key;
 
     struct rbnode *parent;
@@ -17,12 +17,6 @@ typedef struct {
 
 rbnode *rbnode_constructor(size_t smemb, void *key, rbnode *parent,
                            rbnode *left, rbnode *right, enum color_t color);
-
-void *rbnode_setparent(rbnode *node, rbnode *nparent);
-
-void *rbnode_setleft(rbnode *node, rbnode *nleft);
-
-void *rbnode_setright(rbnode *node, rbnode *nright);
 
 void rbnode_rotateleft(rbnode *root);
 
