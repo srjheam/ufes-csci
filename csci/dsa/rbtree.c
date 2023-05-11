@@ -89,12 +89,23 @@ void rbtree_insert(rbtree *tree, void *key) {
     tree->root->color = BLACK;
 }
 
-void *rbtree_lookup(rbtree *tree, void *key) {
+/**
+ * @brief Lookup for a @p key in @p rbtree
+ *
+ * @param tree The binary tree
+ * @param key The key to look for
+ * @param out Local where result will be stored
+ * @param dft Default return value when no key is found
+ *
+ * @note dft parameter may be replaced with a function to allow the client to
+ * raise an exception
+ */
+void rbtree_lookup(rbtree *tree, void *key, void *out, void *dft) {
     rbnode *curr = tree->root;
     while (curr != NULL) {
         int cmp = tree->compar(&key, &curr->key);
         if (cmp == 0)
-            return curr->key;
+            memcpy(out, curr->key, tree->smemb);
 
         if (curr->left == NULL || curr->right == NULL) {
             curr = curr->left == NULL ? curr->right : curr->left;
@@ -104,7 +115,8 @@ void *rbtree_lookup(rbtree *tree, void *key) {
         curr = cmp < 0 ? curr->left : curr->right;
     }
 
-    return NULL;
+    // errno
+    memcpy(out, dft, tree->smemb);
 }
 
 rbtree *rbtree_destructor(rbtree *tree);

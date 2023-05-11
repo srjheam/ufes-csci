@@ -17,7 +17,7 @@ void rbtree_insert(rbtree *tree, void *key);
 
 void rbtree_remove(rbtree *tree, void *key);
 
-void *rbtree_lookup(rbtree *tree, void *key);
+void rbtree_lookup(rbtree *tree, void *key, void *out, void *dft);
 
 rbtree *rbtree_destructor(rbtree *tree);
 
