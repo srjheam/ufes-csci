@@ -3,7 +3,7 @@
 
 #include "rbnode.h"
 
-typedef struct {
+typedef struct rbtree {
     rbnode *root;
 
     compar_fn compar;
