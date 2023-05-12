@@ -1,5 +1,61 @@
 #include "rbtree.h"
 
+rbnode *__rbtree_fixup(rbnode *node) {
+    while (node->parent != NULL && node->parent->color == RED) {
+        rbnode *grandparent = node->parent->parent;
+        rbnode *uncle = grandparent->left == node->parent
+            ? grandparent->right
+            : grandparent->left;
+
+        if (uncle != NULL && uncle->color == RED) {
+            node->parent->color = BLACK;
+            uncle->color = BLACK;
+            grandparent->color = RED;
+
+            node = grandparent;
+            continue;
+        }
+
+        if (node->parent->left == node) {
+            if (grandparent->left == node->parent) {
+                rbnode *x = rbnode_rotateright(grandparent);
+
+                grandparent->color = RED;
+                x->color = BLACK;
+
+                node = x;
+                continue;
+            }
+
+            rbnode *x = rbnode_rotateleft(node->parent);
+
+            node = x->left;
+            continue;
+        }
+
+        if (grandparent->right == node->parent) {
+            rbnode *x = rbnode_rotateleft(grandparent);
+
+            grandparent->color = RED;
+            x->color = BLACK;
+
+            node = x;
+            continue;
+        }
+
+        rbnode *x = rbnode_rotateright(node->parent);
+
+        node = x->right;
+    }
+
+    node->color = BLACK;
+
+    while (node->parent != NULL)
+        node = node->parent;
+
+    return node;
+}
+
 rbtree *rbtree_constructor(compar_fn compar, destruct_fn destructor) {
     rbtree *tree = malloc(sizeof *tree);
 
@@ -17,76 +73,23 @@ void rbtree_insert(rbtree *tree, void *key) {
         return;
     }
 
-    rbnode *root = tree->root;
-    do {
-        int cmp = tree->comparer(key, root->key);
-        if (cmp > 0) {
-            if (root->right == NULL)
-                break;
-        } else if (root->left == NULL)
-            break;
-
-        root = cmp > 0 ? root->right : root->left;
-    } while (1);
-
-    rbnode *nnode = rbnode_constructor(key, root, NULL, NULL, RED);
-
-    int cmp = tree->comparer(key, root->key);
-    if (cmp > 0)
-        root->right = nnode;
-    else
-        root->left = nnode;
-
-    // maintain
-    if (nnode->parent->color == BLACK)
-        return;
-
-    while (nnode->parent != NULL && nnode->parent->color == RED) {
-        rbnode *parent = nnode->parent;
-        rbnode *grandpa = parent->parent;
-        if (parent == grandpa->left) {
-            if (grandpa->right->color == RED) {
-                grandpa->right->color = BLACK;
-                grandpa->left->color = BLACK;
-                grandpa->color = RED;
-
-                nnode = grandpa;
-            } else if (nnode == parent->right) {
-                nnode = parent;
-
-                rbnode_rotateleft(nnode);
-            } else {
-                parent->color = BLACK;
-                grandpa->color = RED;
-
-                rbnode_rotateright(grandpa);
-            }
-        } else {
-            if (grandpa->left->color == RED) {
-                grandpa->right->color = BLACK;
-                grandpa->left->color = BLACK;
-                grandpa->color = RED;
-
-                nnode = grandpa;
-            } else if (nnode == parent->left) {
-                nnode = parent;
-
-                rbnode_rotateright(nnode);
-
-                parent->color = BLACK;
-                grandpa->color = RED;
-
-                rbnode_rotateleft(grandpa);
-            }
-        }
-    }
-
     rbnode *curr = tree->root;
-    while ((curr = curr->parent)) {
-        tree->root = curr;
+    rbnode *prev = NULL;
+    while (curr != NULL) {
+        int cmp = tree->comparer(key, curr->key);
+
+        prev = curr;
+        curr = cmp < 0 ? curr->left : curr->right;
     }
 
-    tree->root->color = BLACK;
+    rbnode *node = rbnode_constructor(key, prev, NULL, NULL, RED);
+    if (tree->comparer(key, prev->key) < 0) {
+        prev->left = node;
+    } else {
+        prev->right = node;
+    }
+
+    tree->root = __rbtree_fixup(node);
 }
 
 /**
@@ -111,6 +114,18 @@ void *rbtree_lookup(rbtree *tree, void *key) {
     }
 
     return NULL;
+}
+
+void *rbtree_iterator_begin(rbtree *tree) {
+    return rbnode_iterator_begin(tree->root);
+}
+
+void *rbtree_iterator_next(void **saveptr) {
+    return rbnode_iterator_next(saveptr);
+}
+
+bool rbtree_iterator_has_next(void **saveptr) {
+    return rbnode_iterator_has_next(saveptr);
 }
 
 void rbtree_clear(rbtree *tree) {

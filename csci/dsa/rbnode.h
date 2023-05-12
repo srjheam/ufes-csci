@@ -18,13 +18,19 @@ typedef struct rbnode {
 rbnode *rbnode_constructor(void *key, rbnode *parent, rbnode *left,
                            rbnode *right, enum color_t color);
 
-void rbnode_rotateleft(rbnode *root);
+rbnode *rbnode_rotateleft(rbnode *root);
 
-void rbnode_rotateright(rbnode *root);
+rbnode *rbnode_rotateright(rbnode *root);
 
-void rbnode_rotateleftright(rbnode *root);
+rbnode *rbnode_rotateleftright(rbnode *root);
 
-void rbnode_rotaterightleft(rbnode *root);
+rbnode *rbnode_rotaterightleft(rbnode *root);
+
+void *rbnode_iterator_begin(rbnode *root);
+
+void *rbnode_iterator_next(void **saveptr);
+
+bool rbnode_iterator_has_next(void **saveptr);
 
 void rbnode_clear(rbnode *root, destruct_fn destructor);
 

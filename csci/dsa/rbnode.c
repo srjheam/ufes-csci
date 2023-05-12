@@ -16,66 +16,120 @@ rbnode *rbnode_constructor(void *key, rbnode *parent, rbnode *left,
     return node;
 }
 
-void rbnode_rotateleft(rbnode *root) {
-    if (root == NULL || root->right == NULL || root->right->left == NULL)
-        return;
-
-    rbnode *oright = root->right;
-
-    root->right = oright->left;
-    root->right->parent = root;
-    oright->parent = NULL;
-
-    if (root->parent == NULL) {
-        oright->left = root;
-    } else if (root->parent->left == root) {
-        root->parent->left = oright;
-        oright->parent = root->parent;
-    } else {
-        root->parent->right = oright;
-        oright->parent = root->parent;
-    }
-
-    root->parent = oright;
-}
-
-void rbnode_rotateright(rbnode *root) {
-    if (root == NULL || root->left == NULL || root->left->right == NULL)
-        return;
-
-    rbnode *oleft = root->left;
-
-    root->left = oleft->right;
-    root->left->parent = root;
-    oleft->parent = NULL;
-
-    if (root->parent == NULL) {
-        oleft->right = root;
-    } else if (root->parent->right == root) {
-        root->parent->right = oleft;
-        oleft->parent = root->parent;
-    } else {
-        root->parent->right = oleft;
-        oleft->parent = root->parent;
-    }
-
-    root->parent = oleft;
-}
-
-void rbnode_rotateleftright(rbnode *root) {
+rbnode *rbnode_rotateleft(rbnode *root) {
     if (root == NULL)
-        return;
+        return root;
+
+    /*               
+     *    r       |       x
+     *      \     |     /
+     *        x   |   r   
+     *      /     |     \
+     *    y       |       y
+     */ 
+
+    rbnode *x = root->right;
+    rbnode *y = x->left;
+
+    x->left = root;
+    x->parent = root->parent;
+    root->parent = x;
+
+    root->right = y;
+    if (y != NULL)
+        y->parent = root;
+
+    return x;
+}
+
+rbnode *rbnode_rotateright(rbnode *root) {
+    if (root == NULL)
+        return root;
+
+    /*   
+     *        r   |   y
+     *      /     |     \
+     *    y       |       r
+     *      \     |     /
+     *        x   |   x
+     */ 
+
+    rbnode *y = root->left;
+    rbnode *x = y->right;
+
+    y->right = root;
+    y->parent = root->parent;
+    root->parent = y;
+
+    root->left = x;
+    if (x != NULL)
+        x->parent = root;
+
+    return y;
+}
+
+rbnode *rbnode_rotateleftright(rbnode *root) {
+    if (root == NULL)
+        return root;
+
+    /*   
+     *        r   |   
+     *      /     |       x
+     *    y       |     /   \ 
+     *      \     |   y       r
+     *        x   |   
+     */ 
 
     rbnode_rotateleft(root->left);
-    rbnode_rotateright(root);
+    return rbnode_rotateright(root);
 }
 
-void rbnode_rotaterightleft(rbnode *root) {
+rbnode *rbnode_rotaterightleft(rbnode *root) {
     if (root == NULL)
-        return;
+        return root;
+
+    /*               
+     *        r   |   
+     *      /     |       x
+     *    y       |     /   \
+     *      \     |   r       y
+     *        x   |   
+     */
 
     rbnode_rotateright(root->right);
-    rbnode_rotateleft(root);
+    return rbnode_rotateleft(root);
+}
+
+void *rbnode_iterator_begin(rbnode *root) {
+    while (root->left != NULL)
+        root = root->left;
+
+    return root;
+}
+
+void *rbnode_iterator_next(void **saveptr) {
+    rbnode *curr = *saveptr;
+    void *val = curr->key;
+
+    if (curr->right != NULL) {
+        curr = curr->right;
+        while (curr->left != NULL)
+            curr = curr->left;
+    } else {
+        while (curr->parent != NULL && curr == curr->parent->right)
+            curr = curr->parent;
+
+        curr = curr->parent;
+    }
+
+    *saveptr = curr;
+    return val;
+}
+
+bool rbnode_iterator_has_next(void **saveptr) {
+    rbnode *curr = *saveptr;
+
+    return curr != NULL;
 }
 
 void rbnode_clear(rbnode *root, destruct_fn destructor) {
