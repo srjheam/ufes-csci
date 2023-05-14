@@ -3,9 +3,8 @@
 rbnode *__rbtree_fixup(rbnode *node) {
     while (node->parent != NULL && node->parent->color == RED) {
         rbnode *grandparent = node->parent->parent;
-        rbnode *uncle = grandparent->left == node->parent
-            ? grandparent->right
-            : grandparent->left;
+        rbnode *uncle = grandparent->left == node->parent ? grandparent->right
+                                                          : grandparent->left;
 
         if (uncle != NULL && uncle->color == RED) {
             node->parent->color = BLACK;
@@ -120,12 +119,16 @@ void *rbtree_iterator_begin(rbtree *tree) {
     return rbnode_iterator_begin(tree->root);
 }
 
-void *rbtree_iterator_next(void **saveptr) {
-    return rbnode_iterator_next(saveptr);
+void *rbtree_iterator_forward(void **saveptr) {
+    return rbnode_iterator_forward(saveptr);
 }
 
-bool rbtree_iterator_has_next(void **saveptr) {
-    return rbnode_iterator_has_next(saveptr);
+void *rbtree_iterator_reverse(void **saveptr) {
+    return rbnode_iterator_reverse(saveptr);
+}
+
+void *rbtree_iterator_end(rbtree *tree) {
+    return rbnode_iterator_end(tree->root);
 }
 
 void rbtree_clear(rbtree *tree) {

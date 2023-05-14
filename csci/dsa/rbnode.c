@@ -20,13 +20,13 @@ rbnode *rbnode_rotateleft(rbnode *root) {
     if (root == NULL)
         return root;
 
-    /*               
+    /*
      *    r       |       x
      *      \     |     /
-     *        x   |   r   
+     *        x   |   r
      *      /     |     \
      *    y       |       y
-     */ 
+     */
 
     rbnode *x = root->right;
     rbnode *y = x->left;
@@ -46,13 +46,13 @@ rbnode *rbnode_rotateright(rbnode *root) {
     if (root == NULL)
         return root;
 
-    /*   
+    /*
      *        r   |   y
      *      /     |     \
      *    y       |       r
      *      \     |     /
      *        x   |   x
-     */ 
+     */
 
     rbnode *y = root->left;
     rbnode *x = y->right;
@@ -72,13 +72,13 @@ rbnode *rbnode_rotateleftright(rbnode *root) {
     if (root == NULL)
         return root;
 
-    /*   
-     *        r   |   
+    /*
+     *        r   |
      *      /     |       x
-     *    y       |     /   \ 
+     *    y       |     /   \
      *      \     |   y       r
-     *        x   |   
-     */ 
+     *        x   |
+     */
 
     rbnode_rotateleft(root->left);
     return rbnode_rotateright(root);
@@ -88,12 +88,12 @@ rbnode *rbnode_rotaterightleft(rbnode *root) {
     if (root == NULL)
         return root;
 
-    /*               
-     *        r   |   
+    /*
+     *        r   |
      *      /     |       x
      *    y       |     /   \
      *      \     |   r       y
-     *        x   |   
+     *        x   |
      */
 
     rbnode_rotateright(root->right);
@@ -107,18 +107,20 @@ void *rbnode_iterator_begin(rbnode *root) {
     return root;
 }
 
-void *rbnode_iterator_next(void **saveptr) {
+void *rbnode_iterator_forward(void **saveptr) {
     rbnode *curr = *saveptr;
+    if (curr == NULL)
+        return NULL;
+
     void *val = curr->key;
 
     if (curr->right != NULL) {
         curr = curr->right;
         while (curr->left != NULL)
             curr = curr->left;
-    } else {
+    } else  {
         while (curr->parent != NULL && curr == curr->parent->right)
             curr = curr->parent;
-
         curr = curr->parent;
     }
 
@@ -126,10 +128,33 @@ void *rbnode_iterator_next(void **saveptr) {
     return val;
 }
 
-bool rbnode_iterator_has_next(void **saveptr) {
+void *rbnode_iterator_reverse(void **saveptr) {
     rbnode *curr = *saveptr;
+    if (curr == NULL)
+        return NULL;
 
-    return curr != NULL;
+    void *val = curr->key;
+
+    if (curr->left != NULL) {
+        curr = curr->left;
+        while (curr->right != NULL)
+            curr = curr->right;
+    } else {
+        while (curr->parent != NULL && curr == curr->parent->left)
+            curr = curr->parent;
+            
+        curr = curr->parent;
+    }
+
+    *saveptr = curr;
+    return val;
+}
+
+void *rbnode_iterator_end(rbnode *root) {
+    while (root->right != NULL)
+        root = root->right;
+
+    return root;
 }
 
 void rbnode_clear(rbnode *root, destruct_fn destructor) {

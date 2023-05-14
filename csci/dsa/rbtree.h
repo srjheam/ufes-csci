@@ -20,9 +20,11 @@ void *rbtree_lookup(rbtree *tree, void *key);
 
 void *rbtree_iterator_begin(rbtree *tree);
 
-void *rbtree_iterator_next(void **saveptr);
+void *rbtree_iterator_forward(void **saveptr);
 
-bool rbtree_iterator_has_next(void **saveptr);
+void *rbtree_iterator_reverse(void **saveptr);
+
+void *rbtree_iterator_end(rbtree *tree);
 
 void rbtree_clear(rbtree *tree);
 

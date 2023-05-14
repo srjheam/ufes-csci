@@ -28,9 +28,11 @@ rbnode *rbnode_rotaterightleft(rbnode *root);
 
 void *rbnode_iterator_begin(rbnode *root);
 
-void *rbnode_iterator_next(void **saveptr);
+void *rbnode_iterator_forward(void **saveptr);
 
-bool rbnode_iterator_has_next(void **saveptr);
+void *rbnode_iterator_reverse(void **saveptr);
+
+void *rbnode_iterator_end(rbnode *root);
 
 void rbnode_clear(rbnode *root, destruct_fn destructor);
 
