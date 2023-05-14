@@ -1,6 +1,39 @@
 #include "rbtree.h"
 
-rbnode *__rbtree_fixup(rbnode *node) {
+rbnode *__rbtree_lookup_node(rbtree *tree, void *key) {
+    rbnode *curr = tree->root;
+    while (curr != NULL) {
+        int cmp = tree->comparer(key, curr->key);
+        if (cmp == 0)
+            return curr;
+
+        if (curr->left == NULL || curr->right == NULL) {
+            curr = curr->left == NULL ? curr->right : curr->left;
+            continue;
+        }
+
+        curr = cmp < 0 ? curr->left : curr->right;
+    }
+
+    return NULL;
+}
+
+void *__rbtree_replace(rbtree *tree, rbnode *node, rbnode *x) {
+    if (node->parent == NULL) {
+        tree->root = x;
+    } else if (node->parent->left == node) {
+        node->parent->left = x;
+    } else {
+        node->parent->right = x;
+    }
+
+    if (x != NULL)
+        x->parent = node->parent;
+
+    return node->key;
+}
+
+rbnode *__rbtree_fixup_insert(rbnode *node) {
     while (node->parent != NULL && node->parent->color == RED) {
         rbnode *grandparent = node->parent->parent;
         rbnode *uncle = grandparent->left == node->parent ? grandparent->right
@@ -55,6 +88,77 @@ rbnode *__rbtree_fixup(rbnode *node) {
     return node;
 }
 
+// TODO:
+//     Test this function complieance with the red-black tree properties
+void __rbtree_fixup_remove(rbnode *x) {
+    while (x != NULL && x->parent != NULL && x->color == BLACK) {
+        rbnode *sibling = x->parent->left == x ? x->parent->right
+                                               : x->parent->left;
+
+        if (sibling->color == RED) {
+            sibling->color = BLACK;
+            x->parent->color = RED;
+
+            if (x->parent->left == x) {
+                rbnode *y = rbnode_rotateleft(x->parent);
+
+                sibling = y->right;
+            } else {
+                rbnode *y = rbnode_rotateright(x->parent);
+
+                sibling = y->left;
+            }
+        }
+
+        if ((sibling->left == NULL || sibling->left->color == BLACK) &&
+            (sibling->right == NULL || sibling->right->color == BLACK)) {
+            sibling->color = RED;
+            x = x->parent;
+            continue;
+        }
+
+        if (x->parent->left == x) {
+            if (sibling->right == NULL || sibling->right->color == BLACK) {
+                sibling->left->color = BLACK;
+                sibling->color = RED;
+
+                rbnode *y = rbnode_rotateright(sibling);
+
+                sibling = y->left;
+            }
+
+            sibling->color = x->parent->color;
+            x->parent->color = BLACK;
+            sibling->right->color = BLACK;
+
+            rbnode *y = rbnode_rotateleft(x->parent);
+
+            x = y;
+            continue;
+        }
+
+        if (sibling->left == NULL || sibling->left->color == BLACK) {
+            sibling->right->color = BLACK;
+            sibling->color = RED;
+
+            rbnode *y = rbnode_rotateleft(sibling);
+
+            sibling = y->right;
+        }
+
+        sibling->color = x->parent->color;
+        x->parent->color = BLACK;
+        sibling->left->color = BLACK;
+
+        rbnode *y = rbnode_rotateright(x->parent);
+
+        x = y;
+    }
+
+    if (x != NULL)
+        x->color = BLACK;
+}
+
 rbtree *rbtree_constructor(compar_fn compar, destruct_fn destructor) {
     rbtree *tree = malloc(sizeof *tree);
 
@@ -88,31 +192,53 @@ void rbtree_insert(rbtree *tree, void *key) {
         prev->right = node;
     }
 
-    tree->root = __rbtree_fixup(node);
+    tree->root = __rbtree_fixup_insert(node);
 }
 
-/**
- * @brief Lookup for a @p key in @p rbtree
- *
- * @param tree The binary tree
- * @param key The key to look for
- */
-void *rbtree_lookup(rbtree *tree, void *key) {
-    rbnode *curr = tree->root;
-    while (curr != NULL) {
-        int cmp = tree->comparer(key, curr->key);
-        if (cmp == 0)
-            return curr->key;
+void *rbtree_remove(rbtree *tree, void *key) {
+    rbnode *node = __rbtree_lookup_node(tree, key);
+    if (node == NULL)
+        return NULL;
 
-        if (curr->left == NULL || curr->right == NULL) {
-            curr = curr->left == NULL ? curr->right : curr->left;
-            continue;
-        }
+    enum color_t color = node->color;
 
-        curr = cmp < 0 ? curr->left : curr->right;
+    rbnode *x = NULL;
+    if (node->left == NULL) {
+        x = node->right;
+
+        __rbtree_replace(tree, node, x);
+    } else if (node->right == NULL) {
+        x = node->left;
+
+        __rbtree_replace(tree, node, x);
+    } else {
+        rbnode *y = node->right;
+        while (y->left != NULL)
+            y = y->left;
+
+        color = y->color;
+        x = y->right;
+
+        if (y->parent == node) {
+            if (x != NULL)
+                x->parent = y;
+        } else
+            __rbtree_replace(tree, y, x);
+
+        __rbtree_replace(tree, node, y);
+        y->color = color;
+
+        x = y;
     }
 
-    return NULL;
+    if (color == BLACK)
+        __rbtree_fixup_remove(x);
+
+    node->parent = NULL;
+    node->left = NULL;
+    node->right = NULL;
+
+    return node;
 }
 
 void *rbtree_iterator_begin(rbtree *tree) {
@@ -133,6 +259,7 @@ void *rbtree_iterator_end(rbtree *tree) {
 
 void rbtree_clear(rbtree *tree) {
     rbnode_clear(tree->root, tree->destructor);
+    rbnode_destructor(tree->root, tree->destructor);
     tree->root = NULL;
 }
 

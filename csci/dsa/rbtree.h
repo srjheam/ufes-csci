@@ -14,7 +14,7 @@ rbtree *rbtree_constructor(compar_fn compar, destruct_fn destructor);
 
 void rbtree_insert(rbtree *tree, void *key);
 
-void rbtree_remove(rbtree *tree, void *key);
+void *rbtree_remove(rbtree *tree, void *key);
 
 void *rbtree_lookup(rbtree *tree, void *key);
 

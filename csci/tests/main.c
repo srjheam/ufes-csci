@@ -10,9 +10,20 @@ void print_tree(rbtree *root) {
 
     void *it = rbtree_iterator_begin(root);
     int *curr;
-    while ((curr = rbtree_iterator_forward(&it)))
-        printf("%d ", *(int *)curr);
-    
+    enum color_t color = ((rbnode *)it)->color;
+    while ((curr = rbtree_iterator_forward(&it))) {
+        printf("%d", *(int *)curr);
+        if (color == RED)
+            printf("*");
+        else
+            printf(" ");
+
+        printf(" ");
+
+        if (it != NULL)
+            color = ((rbnode *)it)->color;
+    }
+
     printf("\n");
 }
 
@@ -22,9 +33,20 @@ void print_rtree(rbtree *root) {
 
     void *it = rbtree_iterator_end(root);
     int *curr;
-    while ((curr = rbtree_iterator_reverse(&it)))
-        printf("%d ", *(int *)curr);
-    
+    enum color_t color = ((rbnode *)it)->color;
+    while ((curr = rbtree_iterator_reverse(&it))) {
+        printf("%d", *(int *)curr);
+        if (color == RED)
+            printf("*");
+        else
+            printf(" ");
+            
+        printf(" ");
+
+        if (it != NULL)
+            color = ((rbnode *)it)->color;
+    }
+
     printf("\n");
 }
 
@@ -63,6 +85,12 @@ int main() {
 
     int i = 564;
     rbtree_insert(t, &i);
+
+    print_tree(t);
+    print_rtree(t);
+
+    rbnode_destructor(rbtree_remove(t, &i), NULL);
+    rbnode_destructor(rbtree_remove(t, &h), NULL);
 
     print_tree(t);
     print_rtree(t);

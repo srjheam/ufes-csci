@@ -118,7 +118,7 @@ void *rbnode_iterator_forward(void **saveptr) {
         curr = curr->right;
         while (curr->left != NULL)
             curr = curr->left;
-    } else  {
+    } else {
         while (curr->parent != NULL && curr == curr->parent->right)
             curr = curr->parent;
         curr = curr->parent;
@@ -142,7 +142,7 @@ void *rbnode_iterator_reverse(void **saveptr) {
     } else {
         while (curr->parent != NULL && curr == curr->parent->left)
             curr = curr->parent;
-            
+
         curr = curr->parent;
     }
 
@@ -162,9 +162,12 @@ void rbnode_clear(rbnode *root, destruct_fn destructor) {
         return;
 
     rbnode_clear(root->left, destructor);
-    rbnode_clear(root->right, destructor);
+    rbnode_destructor(root->left, destructor);
+    root->left = NULL;
 
-    rbnode_destructor(root, destructor);
+    rbnode_clear(root->right, destructor);
+    rbnode_destructor(root->right, destructor);
+    root->right = NULL;
 }
 
 void rbnode_destructor(rbnode *node, destruct_fn destructor) {
