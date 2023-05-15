@@ -6,7 +6,7 @@
 # LIBTARGET - é o caminho para a biblioteca compilada
 # SRCS      - lista com os caminhos para todos .c
 # OBJS      - lista com os caminhos para todos .o
-INCLUDE = .
+INCLUDE = include
 BUILDIR = build
 LIBNAME = dsa
 LIBTARGET = lib$(LIBNAME).a

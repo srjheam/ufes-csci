@@ -6,7 +6,7 @@
 # LIBDSA      - é a biblioteca de tipos comuns.
 INCLUDE          = .
 LIBDSADIR     = ../dsa
-LIBDSAINCLUDE = $(LIBDSADIR)
+LIBDSAINCLUDE = $(LIBDSADIR)/include
 LIBDSA        = dsa
 LIBDSAAR      = $(LIBDSADIR)/lib$(LIBDSA).a
 MAIN          = main

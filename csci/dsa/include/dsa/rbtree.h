@@ -1,7 +1,7 @@
 #ifndef _RBTREE_H_
 #define _RBTREE_H_
 
-#include "rbnode.h"
+#include "dsa/rbnode.h"
 
 typedef struct rbtree {
     rbnode *root;

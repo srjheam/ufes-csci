@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "exceptions.h"
+#include "dsa/exceptions.h"
 
 void exception_throw(char *name, char *msg, int code) {
     fprintf(stderr, "%s\n\n%s\n", name, msg);

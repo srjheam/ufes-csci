@@ -1,7 +1,7 @@
 #ifndef _RBNODE_H_
 #define _RBNODE_H_
 
-#include "common.h"
+#include "dsa/common.h"
 
 enum color_t { BLACK, RED };
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "rbtree.h"
+#include "dsa/rbtree.h"
 
 int intcmp(const int *a, const int *b) { return *a - *b; }
 
@@ -58,7 +58,7 @@ int main() {
 
     int b = 213;
     rbtree_insert(t, &b);
-
+/* 
     int c = 3;
     rbtree_insert(t, &c);
 
@@ -78,13 +78,16 @@ int main() {
     rbtree_insert(t, &f);
 
     int g = 0;
-    rbtree_insert(t, &g);
+    rbtree_insert(t, &g); */
 
     int h = -12;
     rbtree_insert(t, &h);
 
     int i = 564;
     rbtree_insert(t, &i);
+
+    int j = 3423;
+    rbtree_insert(t, &j);
 
     print_tree(t);
     print_rtree(t);

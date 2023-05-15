@@ -1,4 +1,4 @@
-#include "rbtree.h"
+#include "dsa/rbtree.h"
 
 rbnode *__rbtree_lookup_node(rbtree *tree, void *key) {
     rbnode *curr = tree->root;
