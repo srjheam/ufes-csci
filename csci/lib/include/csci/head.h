@@ -1,7 +1,7 @@
 #ifndef _CSCI_HEAD_H_
 #define _CSCI_HEAD_H_
 
-#include "cell.h"
+#include "csci/cell.h"
 
 typedef struct {
     size_t i;

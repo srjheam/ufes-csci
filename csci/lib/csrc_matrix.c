@@ -34,8 +34,7 @@ void __csrc_matrix_set_addfix_cols(CsrcMatrix *self, Cell *cell) {
         currRow->prevRow = cell;
 
         col->head = cell;
-    }
-    else {
+    } else {
         cell->prevRow = currRow;
         cell->nextRow = currRow->nextRow;
 
@@ -75,6 +74,32 @@ double csrc_matrix_get(CsrcMatrix *self, int i, int j) {
 
     return currCol->data;
 }
+
+Cell *csrc_matrix_get_row(CsrcMatrix *self, int i) {
+    if (i < 0 || i >= self->shape_n)
+        exception_throw_index("csrc_matrix_get_row");
+
+    Head *row = index_lookup(self->rows, i);
+    if (!row)
+        return NULL;
+
+    return head_first(row);
+}
+
+Cell *csrc_matrix_get_col(CsrcMatrix *self, int j) {
+    if (j < 0 || j >= self->shape_m)
+        exception_throw_index("csrc_matrix_get_col");
+
+    Head *col = index_lookup(self->cols, j);
+    if (!col)
+        return NULL;
+
+    return head_first(col);
+}
+
+size_t csrc_matrix_shape_n(CsrcMatrix *self) { return self->shape_n; }
+
+size_t csrc_matrix_shape_m(CsrcMatrix *self) { return self->shape_m; }
 
 void csrc_matrix_set(CsrcMatrix *self, int i, int j, double value) {
     if (i < 0 || i >= self->shape_n || j < 0 || j >= self->shape_m)
@@ -142,18 +167,12 @@ void csrc_matrix_set(CsrcMatrix *self, int i, int j, double value) {
         ncell->nextCol = currCol->nextCol;
 
         currCol->nextCol = ncell;
-        
+
         __csrc_matrix_set_addfix_cols(self, ncell);
     }
 }
 
-void *csrc_matrix_iterator_begin(CsrcMatrix *self);
-
-void *csrc_matrix_iterator_forward(CsrcMatrix *self);
-
-void *csrc_matrix_iterator_end(CsrcMatrix *self);
-
-void csrc_matrix_print(CsrcMatrix *self);
+void csrc_matrix_print_sparse(CsrcMatrix *self);
 
 void csrc_matrix_clear(CsrcMatrix *self);
 

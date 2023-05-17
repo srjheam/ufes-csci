@@ -9,15 +9,17 @@ CsrcMatrix *csrc_matrix_constructor_z(int n, int m);
 
 double csrc_matrix_get(CsrcMatrix *self, int i, int j);
 
+Cell *csrc_matrix_get_row(CsrcMatrix *self, int i);
+
+Cell *csrc_matrix_get_col(CsrcMatrix *self, int j);
+
+size_t csrc_matrix_shape_n(CsrcMatrix *self);
+
+size_t csrc_matrix_shape_m(CsrcMatrix *self);
+
 void csrc_matrix_set(CsrcMatrix *self, int i, int j, double value);
 
-void *csrc_matrix_iterator_begin(CsrcMatrix *self);
-
-void *csrc_matrix_iterator_forward(CsrcMatrix *self);
-
-void *csrc_matrix_iterator_end(CsrcMatrix *self);
-
-void csrc_matrix_print(CsrcMatrix *self);
+void csrc_matrix_print_sparse(CsrcMatrix *self);
 
 void csrc_matrix_clear(CsrcMatrix *self);
 
