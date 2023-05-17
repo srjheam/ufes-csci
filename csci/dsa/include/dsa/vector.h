@@ -27,6 +27,10 @@ void vector_insert(vector *vector, void *elem, size_t i);
 
 void vector_remove(vector *vector, size_t i);
 
+size_t vector_ptrtoindex(vector *vector, void *ptr);
+
+size_t vector_bsearch_nearest_i(vector *v, void *key);
+
 void *vector_bsearch_nearest(vector *vector, void *key);
 
 void *vector_bsearch(vector *vector, void *key);

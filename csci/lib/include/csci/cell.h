@@ -3,10 +3,22 @@
 
 #include "dsa/common.h"
 
-typedef struct Cell Cell;
+typedef struct Cell {
+    Cell *prevRow;
+    Cell *nextRow;
+    Cell *prevCol;
+    Cell *nextCol;
 
-Cell *cell_constructor(int row, int col, void *data);
+    size_t row;
+    size_t col;
 
-void cell_destructor(Cell *cell, destruct_fn destructor);
+    double data;
+} Cell;
+
+Cell *cell_constructor(size_t row, size_t col, double data);
+
+void cell_remove(Cell *cell);
+
+void cell_destructor(Cell *cell);
 
 #endif

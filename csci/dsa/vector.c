@@ -74,6 +74,15 @@ void vector_remove(vector *vector, size_t i) {
     vector->len--;
 }
 
+size_t vector_ptrtoindex(vector *vector, void *ptr) {
+    return ((byte *)ptr - vector->arr) / vector->smemb;
+}
+
+size_t vector_bsearch_nearest_i(vector *v, void *key) {
+    return (vector_bsearch_nearest(v, key) - vector_iterator_begin(v)) /
+           v->smemb;
+}
+
 void *vector_bsearch_nearest(vector *v, void *key) {
     size_t l = 0;
     size_t r = v->len - 1;

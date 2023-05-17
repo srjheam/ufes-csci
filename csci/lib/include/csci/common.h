@@ -1,12 +1,6 @@
 #ifndef _CSCI_COMMON_H_
 #define _CSCI_COMMON_H_
 
-enum dtype {
-    INT32,
-    FLOAT32,
-    DOUBLE64,
-};
-
 int common_int32_compar(const int *a, const int *b);
 
 int common_float32_compar(const float *a, const float *b);

@@ -1,13 +1,6 @@
 #include "csci/cell.h"
 
-struct Cell {
-    int row;
-    int col;
-
-    void *data;
-};
-
-Cell *cell_constructor(int row, int col, void *data) {
+Cell *cell_constructor(size_t row, size_t col, double data) {
     Cell *self = malloc(sizeof *self);
 
     self->row = row;
@@ -18,9 +11,19 @@ Cell *cell_constructor(int row, int col, void *data) {
     return self;
 }
 
-void cell_destructor(Cell *cell, destruct_fn destructor) {
-    if (destructor)
-        destructor(cell->data);
+void cell_remove(Cell *cell) {
+    if (cell->prevRow)
+        cell->prevRow->nextRow = cell->nextRow;
+    if (cell->nextRow)
+        cell->nextRow->prevRow = cell->prevRow;
+    if (cell->prevCol)
+        cell->prevCol->nextCol = cell->nextCol;
+    if (cell->nextCol)
+        cell->nextCol->prevCol = cell->prevCol;
 
+    cell->data = 0;
+}
+
+void cell_destructor(Cell *cell) {
     free(cell);
 }

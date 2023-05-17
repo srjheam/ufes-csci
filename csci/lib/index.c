@@ -1,7 +1,8 @@
+#include "assert.h"
+
 #include "dsa/vector.h"
 
 #include "csci/common.h"
-#include "csci/head.h"
 
 #include "csci/index.h"
 
@@ -9,7 +10,7 @@ struct Index {
     vector *vector;
 };
 
-Index *index_constructor(compar_fn compar) {
+Index *index_constructor() {
     Index *index = malloc(sizeof *index);
 
     index->vector =
@@ -18,42 +19,42 @@ Index *index_constructor(compar_fn compar) {
     return index;
 }
 
-list *index_add(Index *index, size_t i, compar_fn compar, copy_fn copy,
-                destruct_fn destruct) {
-    Head head = {.i = i, .v = NULL};
+Head *index_add(Index *index, size_t i) {
+    Head head = {.i = i, .head = NULL};
 
-    Head *found = vector_bsearch(index->vector, &head);
-    if (found)
-        return found->v;
-
-    head.v = list_constructor(compar, copy, destruct);
-
-    int i = (vector_bsearch_nearest(index->vector, &head) -
-             vector_iterator_begin(index->vector)) /
-            index->vector->smemb;
+    Head *found = vector_bsearch_nearest(index->vector, &head);
+    size_t i = vector_ptrtoindex(index->vector, found);
+    if (i < index->vector->len)
+        return found;
 
     vector_insert(index->vector, &head, i);
 }
 
-void index_remove(Index *index, size_t i) {}
+void index_remove(Index *index, size_t i) {
+    Head head = {.i = i, .head = NULL};
 
-list *index_lookup(Index *index, size_t i) {
-    Head head = {.i = i, .v = NULL};
+    Head *found = vector_bsearch(index->vector, &head);
+    if (!found)
+        return;
+
+    assert(found->head == NULL);
+
+    vector_remove(index->vector, vector_ptrtoindex(index->vector, found));
+}
+
+Head *index_lookup(Index *index, size_t i) {
+    Head head = {.i = i, .head = NULL};
 
     Head *found = vector_bsearch(index->vector, &head);
 
-    if (!found) {
-        return NULL;
-    }
-
-    return found->v;
+    return found;
 }
 
 void index_clear(Index *index) {
     for (Head *it = vector_iterator_begin(index->vector); it;
          it = vector_iterator_forward(index->vector, &it)) {
-        list_destructor(it->v);
-        it->v = NULL;
+        list_destructor(it->head);
+        it->head = NULL;
     }
 }
 

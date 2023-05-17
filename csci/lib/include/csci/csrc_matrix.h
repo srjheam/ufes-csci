@@ -5,11 +5,11 @@
 
 typedef struct CsrcMatrix CsrcMatrix;
 
-CsrcMatrix *csrc_matrix_constructor_z(int n, int m, enum dtype dtype);
+CsrcMatrix *csrc_matrix_constructor_z(int n, int m);
 
-void *csrc_matrix_get(CsrcMatrix *self, int i, int j);
+double csrc_matrix_get(CsrcMatrix *self, int i, int j);
 
-void csrc_matrix_set(CsrcMatrix *self, int i, int j, void *value);
+void csrc_matrix_set(CsrcMatrix *self, int i, int j, double value);
 
 void *csrc_matrix_iterator_begin(CsrcMatrix *self);
 

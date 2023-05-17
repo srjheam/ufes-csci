@@ -3,16 +3,17 @@
 
 #include "dsa/list.h"
 
+#include "csci/head.h"
+
 typedef struct Index Index;
 
-Index *index_constructor(compar_fn compar);
+Index *index_constructor();
 
-list *index_add(Index *index, size_t i, compar_fn compar, copy_fn copy,
-                destruct_fn destruct);
+Head *index_add(Index *index, size_t i);
 
 void index_remove(Index *index, size_t i);
 
-list *index_lookup(Index *index, size_t i);
+Head *index_lookup(Index *index, size_t i);
 
 void index_clear(Index *index);
 
