@@ -7,7 +7,15 @@ typedef struct CsrcMatrixIterator CsrcMatrixIterator;
 
 CsrcMatrixIterator *csrc_matrix_iterator_begin(CsrcMatrix *self);
 
-double *csrc_matrix_iterator_forward(CsrcMatrixIterator *self);
+size_t csrc_matrix_iterator_get_i(CsrcMatrixIterator *self);
+
+size_t csrc_matrix_iterator_get_j(CsrcMatrixIterator *self);
+
+double csrc_matrix_iterator_forward_row_dense(CsrcMatrixIterator *self);
+
+Cell *csrc_matrix_iterator_forward_row_sparse(CsrcMatrixIterator *self);
+
+Cell *csrc_matrix_iterator_forward_column_sparse(CsrcMatrixIterator *self);
 
 void csrv_matrix_iterator_destructor(CsrcMatrixIterator *self);
 
