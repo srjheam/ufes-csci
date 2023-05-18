@@ -6,6 +6,11 @@ Cell *cell_constructor(size_t row, size_t col, double data) {
     self->row = row;
     self->col = col;
 
+    self->nextCol = NULL;
+    self->nextRow = NULL;
+    self->prevCol = NULL;
+    self->prevRow = NULL;
+
     self->data = data;
 
     return self;
