@@ -7,6 +7,8 @@ typedef struct CsrcMatrix CsrcMatrix;
 
 CsrcMatrix *csrc_matrix_constructor_z(size_t n, size_t m);
 
+void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value);
+
 double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j);
 
 Cell *csrc_matrix_get_row(CsrcMatrix *self, size_t i);
@@ -17,11 +19,9 @@ size_t csrc_matrix_shape_n(CsrcMatrix *self);
 
 size_t csrc_matrix_shape_m(CsrcMatrix *self);
 
-void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value);
+int csrc_matrix_compar(CsrcMatrix *self, CsrcMatrix *b);
 
-void csrc_matrix_print_sparse(CsrcMatrix *self);
-
-void csrc_matrix_print_dense(CsrcMatrix *self);
+CsrcMatrix *csrc_matrix_copy(CsrcMatrix *self);
 
 void csrc_matrix_clear(CsrcMatrix *self);
 

@@ -3,6 +3,7 @@
 
 #include "csci/csrc_matrix.h"
 #include "csci/csrc_matrix_iterator.h"
+#include "csci/csrc_matrix_out.h"
 
 int main() {
     CsrcMatrix *mat = csrc_matrix_constructor_z(3, 3);
@@ -49,7 +50,17 @@ int main() {
     assert(csrc_matrix_get(mat, 2, 1) == 8);
     assert(csrc_matrix_get(mat, 2, 2) == 0);
 
-    csrc_matrix_destructor(mat);   
+    csrc_matrix_save(mat, "./test_matrix.bin");
+
+    CsrcMatrix *lmat = csrc_matrix_load("./test_matrix.bin");
+
+    csrc_matrix_print_sparse(mat);
+    csrc_matrix_print_sparse(lmat);
+
+    printf("mat == lmat: %s\n", csrc_matrix_compar(mat, lmat) != 0 ? "true" : "false");
+
+    csrc_matrix_destructor(mat);
+    csrc_matrix_destructor(lmat);
 
     return 0;
 }

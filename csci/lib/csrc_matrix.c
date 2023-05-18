@@ -176,38 +176,49 @@ void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value) {
     }
 }
 
-void csrc_matrix_print_sparse(CsrcMatrix *self) {
-    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
-    for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr;
-         curr = csrc_matrix_iterator_forward_row_sparse(it))
-        printf("(%ld, %ld) = %lf\n", curr->row, curr->col, curr->data);
-
-    csrv_matrix_iterator_destructor(it);
-}
-
-void csrc_matrix_print_dense(CsrcMatrix *self) {
-    printf("[[");
+int csrc_matrix_compar(CsrcMatrix *self, CsrcMatrix *b) {
+    if (self->shape_n != b->shape_n || self->shape_m != b->shape_m)
+        return 0;
 
     CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
-    for (const double *curr = csrc_matrix_iterator_forward_row_dense(it); curr;
-         curr = csrc_matrix_iterator_forward_row_dense(it)) {
-        if (csrc_matrix_iterator_get_j(it) == 0 && csrc_matrix_iterator_get_i(it) != 0)
-            printf(" [");
+    CsrcMatrixIterator *itb = csrc_matrix_iterator_begin(b);
 
-        printf("%lf", *curr);
+    Cell *curr = csrc_matrix_iterator_forward_row_sparse(it);
+    Cell *currb = csrc_matrix_iterator_forward_row_sparse(itb);
 
-        if (csrc_matrix_iterator_get_j(it) == csrc_matrix_shape_m(self) - 1) {
-            printf("]");
+    while (curr && currb) {
+        if (curr->row != currb->row || curr->col != currb->col ||
+            curr->data != currb->data) {
+            csrv_matrix_iterator_destructor(it);
+            csrv_matrix_iterator_destructor(itb);
 
-            if (csrc_matrix_iterator_get_i(it) != csrc_matrix_shape_n(self) - 1)
-                printf(",\n");
-        } else
-            printf(", ");
+            return 0;
+        }
+
+        curr = csrc_matrix_iterator_forward_row_sparse(it);
+        currb = csrc_matrix_iterator_forward_row_sparse(itb);
     }
 
     csrv_matrix_iterator_destructor(it);
+    csrv_matrix_iterator_destructor(itb);
 
-    printf("]\n");
+    if (curr || currb)
+        return 0;
+
+    return 1;
+}
+
+CsrcMatrix *csrc_matrix_copy(CsrcMatrix *self) {
+    CsrcMatrix *nmat = csrc_matrix_constructor_z(self->shape_n, self->shape_m);
+
+    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
+    for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr;
+         curr = csrc_matrix_iterator_forward_row_sparse(it))
+        csrc_matrix_set(nmat, curr->row, curr->col, curr->data);
+
+    csrv_matrix_iterator_destructor(it);
+
+    return nmat;
 }
 
 void csrc_matrix_clear(CsrcMatrix *self) {
