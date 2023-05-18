@@ -29,6 +29,14 @@ int main() {
     csrc_matrix_print_sparse(mat);
 
     csrc_matrix_print_dense(mat);
+    
+    csrc_matrix_set(mat, 0, 1, 0);
+    csrc_matrix_set(mat, 1, 0, 0);
+    csrc_matrix_set(mat, 2, 2, 0);
+
+    csrc_matrix_print_sparse(mat);
+
+    csrc_matrix_print_dense(mat);
 
     csrc_matrix_destructor(mat);   
 

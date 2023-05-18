@@ -158,6 +158,8 @@ void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value) {
             if (!firstRow)
                 index_remove(self->cols, j);
 
+            cell_destructor(currCol);
+
             return;
         }
 
