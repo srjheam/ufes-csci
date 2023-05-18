@@ -35,24 +35,24 @@ void __iterator_begin_col(CsrcMatrixIterator *self) {
     self->curr = curr;
 }
 
-Cell *__iterator_forward_row(CsrcMatrixIterator *mat) {
-    if (mat->curr->nextCol == NULL)
-        if (mat->curr->row + 1 == csrc_matrix_shape_n(mat))
+Cell *__iterator_forward_row(CsrcMatrixIterator *self) {
+    if (self->curr->nextCol == NULL)
+        if (self->curr->row + 1 == csrc_matrix_shape_n(self->matrix))
             return NULL;
         else
-            return csrc_matrix_get_row(mat, mat->curr->row + 1);
+            return csrc_matrix_get_row(self->matrix, self->curr->row + 1);
     else
-        return mat->curr->nextCol;
+        return self->curr->nextCol;
 }
 
-Cell *__iterator_forward_col(CsrcMatrixIterator *mat) {
-    if (mat->curr->nextRow == NULL)
-        if (mat->curr->col + 1 == csrc_matrix_shape_m(mat))
+Cell *__iterator_forward_col(CsrcMatrixIterator *self) {
+    if (self->curr->nextRow == NULL)
+        if (self->curr->col + 1 == csrc_matrix_shape_m(self->matrix))
             return NULL;
         else
-            return csrc_matrix_get_col(mat, mat->curr->col + 1);
+            return csrc_matrix_get_col(self->matrix, self->curr->col + 1);
     else
-        return mat->curr->nextRow;
+        return self->curr->nextRow;
 }
 
 CsrcMatrixIterator *csrc_matrix_iterator_begin(CsrcMatrix *mat) {
@@ -63,7 +63,7 @@ CsrcMatrixIterator *csrc_matrix_iterator_begin(CsrcMatrix *mat) {
     iterator->row = 0;
     iterator->col = 0;
 
-    Cell *curr = NULL;
+    iterator->curr = NULL;
 
     return iterator;
 }
@@ -76,14 +76,14 @@ size_t csrc_matrix_iterator_get_j(CsrcMatrixIterator *self) {
     return self->col;
 }
 
-double *csrc_matrix_iterator_forward_row_dense(CsrcMatrixIterator *self) {
+const double *csrc_matrix_iterator_forward_row_dense(CsrcMatrixIterator *self) {
     __iterator_begin_row(self);
 
     if (self->row == csrc_matrix_shape_n(self->matrix) - 1 &&
         self->col == csrc_matrix_shape_m(self->matrix) - 1)
         return NULL;
 
-    double *val = self->curr == NULL || self->curr->row != self->row ||
+    const double *val = self->curr == NULL || self->curr->row != self->row ||
                           self->curr->col != self->col
                       ? &__ZERO
                       : &self->curr->data;
@@ -109,14 +109,14 @@ Cell *csrc_matrix_iterator_forward_row_sparse(CsrcMatrixIterator *self) {
     if (!self->curr)
         return NULL;
 
-    double *val = &self->curr->data;
+    Cell *c = self->curr;
 
     self->col = self->curr->col;
     self->row = self->curr->row;
 
     self->curr = __iterator_forward_row(self);
 
-    return val;
+    return c;
 }
 
 Cell *csrc_matrix_iterator_forward_column_sparse(CsrcMatrixIterator *self) {
@@ -125,14 +125,14 @@ Cell *csrc_matrix_iterator_forward_column_sparse(CsrcMatrixIterator *self) {
     if (!self->curr)
         return NULL;
 
-    double *val = &self->curr->data;
+    Cell *c = self->curr;
 
     self->col = self->curr->col;
     self->row = self->curr->row;
 
     self->curr = __iterator_forward_col(self);
 
-    return val;
+    return c;
 }
 
 void csrv_matrix_iterator_destructor(CsrcMatrixIterator *self) {

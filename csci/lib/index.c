@@ -2,8 +2,6 @@
 
 #include "dsa/vector.h"
 
-#include "csci/common.h"
-
 #include "csci/index.h"
 
 struct Index {
@@ -23,11 +21,13 @@ Head *index_add(Index *index, size_t i) {
     Head head = {.i = i, .head = NULL};
 
     Head *found = vector_bsearch_nearest(index->vector, &head);
-    size_t i = vector_ptrtoindex(index->vector, found);
-    if (i < index->vector->len)
+    size_t idx = vector_ptrtoindex(index->vector, found);
+    if (i == found->i)
         return found;
 
-    vector_insert(index->vector, &head, i);
+    vector_insert(index->vector, &head, idx);
+
+    return vector_index(index->vector, idx);
 }
 
 void index_remove(Index *index, size_t i) {
@@ -50,16 +50,7 @@ Head *index_lookup(Index *index, size_t i) {
     return found;
 }
 
-void index_clear(Index *index) {
-    for (Head *it = vector_iterator_begin(index->vector); it;
-         it = vector_iterator_forward(index->vector, &it)) {
-        list_destructor(it->head);
-        it->head = NULL;
-    }
-}
-
 void index_destructor(Index *index) {
-    index_clear(index);
     vector_destructor(index->vector);
 
     free(index);

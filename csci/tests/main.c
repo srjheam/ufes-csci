@@ -1,104 +1,26 @@
 #include <stdio.h>
 
-#include "dsa/rbtree.h"
-
-int intcmp(const int *a, const int *b) { return *a - *b; }
-
-void print_tree(rbtree *root) {
-    if (root == NULL)
-        return;
-
-    void *it = rbtree_iterator_begin(root);
-    int *curr;
-    enum color_t color = ((rbnode *)it)->color;
-    while ((curr = rbtree_iterator_forward(&it))) {
-        printf("%d", *(int *)curr);
-        if (color == RED)
-            printf("*");
-        else
-            printf(" ");
-
-        printf(" ");
-
-        if (it != NULL)
-            color = ((rbnode *)it)->color;
-    }
-
-    printf("\n");
-}
-
-void print_rtree(rbtree *root) {
-    if (root == NULL)
-        return;
-
-    void *it = rbtree_iterator_end(root);
-    int *curr;
-    enum color_t color = ((rbnode *)it)->color;
-    while ((curr = rbtree_iterator_reverse(&it))) {
-        printf("%d", *(int *)curr);
-        if (color == RED)
-            printf("*");
-        else
-            printf(" ");
-            
-        printf(" ");
-
-        if (it != NULL)
-            color = ((rbnode *)it)->color;
-    }
-
-    printf("\n");
-}
+#include "csci/csrc_matrix.h"
+#include "csci/csrc_matrix_iterator.h"
 
 int main() {
-    rbtree *t = rbtree_constructor((compar_fn)intcmp, NULL);
+    CsrcMatrix *mat = csrc_matrix_constructor_z(3, 3);
 
-    int a = 123;
-    rbtree_insert(t, &a);
+    csrc_matrix_set(mat, 0, 0, 1);
+    csrc_matrix_set(mat, 0, 1, 2);
+    csrc_matrix_set(mat, 0, 2, 3);
+    csrc_matrix_set(mat, 1, 0, 4);
+    csrc_matrix_set(mat, 1, 1, 5);
+    csrc_matrix_set(mat, 1, 2, 6);
+    csrc_matrix_set(mat, 2, 0, 7);
+    csrc_matrix_set(mat, 2, 1, 8);
+    csrc_matrix_set(mat, 2, 2, 9);
 
-    int b = 213;
-    rbtree_insert(t, &b);
-/* 
-    int c = 3;
-    rbtree_insert(t, &c);
+    csrc_matrix_print_sparse(mat);
 
-    int j = 3;
-    rbtree_insert(t, &j);
+    csrc_matrix_print_dense(mat);
 
-    int k = 765;
-    rbtree_insert(t, &k);
-
-    int d = 765;
-    rbtree_insert(t, &d);
-
-    int e = 2;
-    rbtree_insert(t, &e);
-
-    int f = 5;
-    rbtree_insert(t, &f);
-
-    int g = 0;
-    rbtree_insert(t, &g); */
-
-    int h = -12;
-    rbtree_insert(t, &h);
-
-    int i = 564;
-    rbtree_insert(t, &i);
-
-    int j = 3423;
-    rbtree_insert(t, &j);
-
-    print_tree(t);
-    print_rtree(t);
-
-    rbnode_destructor(rbtree_remove(t, &i), NULL);
-    rbnode_destructor(rbtree_remove(t, &h), NULL);
-
-    print_tree(t);
-    print_rtree(t);
-
-    rbtree_destructor(t);
+    csrc_matrix_destructor(mat);   
 
     return 0;
 }

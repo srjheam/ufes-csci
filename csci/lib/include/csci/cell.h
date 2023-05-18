@@ -4,10 +4,10 @@
 #include "dsa/common.h"
 
 typedef struct Cell {
-    Cell *prevRow;
-    Cell *nextRow;
-    Cell *prevCol;
-    Cell *nextCol;
+    struct Cell *prevRow;
+    struct Cell *nextRow;
+    struct Cell *prevCol;
+    struct Cell *nextCol;
 
     size_t row;
     size_t col;

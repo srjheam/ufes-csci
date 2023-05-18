@@ -79,7 +79,7 @@ size_t vector_ptrtoindex(vector *vector, void *ptr) {
 }
 
 size_t vector_bsearch_nearest_i(vector *v, void *key) {
-    return (vector_bsearch_nearest(v, key) - vector_iterator_begin(v)) /
+    return ((byte *)vector_bsearch_nearest(v, key) - (byte *)vector_iterator_begin(v)) /
            v->smemb;
 }
 
@@ -87,7 +87,7 @@ void *vector_bsearch_nearest(vector *v, void *key) {
     size_t l = 0;
     size_t r = v->len - 1;
 
-    int *cmp = 1;
+    int *cmp = NULL;
     while (l <= r) {
         size_t m = l + (r - l) / 2;
 

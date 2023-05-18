@@ -5,17 +5,24 @@
 # LIBDSADIR   - é o diretório para a biblioteca de tipos comuns.
 # LIBDSA      - é a biblioteca de tipos comuns.
 INCLUDE          = .
+
 LIBDSADIR     = ../dsa
 LIBDSAINCLUDE = $(LIBDSADIR)/include
 LIBDSA        = dsa
 LIBDSAAR      = $(LIBDSADIR)/lib$(LIBDSA).a
+
+LIBCSCIDIR     = ../lib
+LIBCSCIINCLUDE = $(LIBCSCIDIR)/include
+LIBCSCI        = csci
+LIBCSCIAR      = $(LIBCSCIDIR)/lib$(LIBCSCI).a
+
 MAIN          = main
 VALGRINDOUT   = valgrind-out.txt
 
 # CCompiler - é o compilador usado
 # CFLAGS    - são as flags dadas ao compilador durante a compilação
 CC = gcc
-override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBDSAINCLUDE) -I$(LIBENGINEINCLUDE) -lm
+override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBDSAINCLUDE) -L $(LIBDSADIR)/ -l$(LIBDSA) -I$(LIBCSCIINCLUDE) -L $(LIBCSCIDIR)/ -l$(LIBCSCI) -lm
 
 # Make - é o GNU Make
 MAKE = make
@@ -23,12 +30,13 @@ MAKE = make
 all : pre-build build
 
 # Compila o executável e linka as bibliotecas
-main: main.c $(LIBDSAAR)
-	$(CC) -o $@ $< -L $(LIBDSADIR)/ -l$(LIBDSA) $(CFLAGS)
+main: main.c $(LIBDSAAR) $(LIBCSCIAR)
+	$(CC) -o $@ $<  $(CFLAGS)
 
 # Chama os submakefiles garantindo a compilação das bibliotecas
 pre-build:
 	$(MAKE) -C $(LIBDSADIR)/
+	$(MAKE) -C $(LIBCSCIDIR)/
 
 build : main
 
@@ -36,6 +44,7 @@ build : main
 clean:
 	rm -f $(MAIN) $(VALGRINDOUT)
 	$(MAKE) -C $(LIBDSADIR)/ clean
+	$(MAKE) -C $(LIBCSCIDIR)/ clean
 
 valgrind: all
 	rm -f $(VALGRINDOUT)
