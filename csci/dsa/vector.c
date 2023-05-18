@@ -47,7 +47,7 @@ void *vector_index(vector *vector, size_t idx) {
 }
 
 void vector_insert(vector *vector, void *elem, size_t i) {
-    if (i >= vector->len)
+    if (i > vector->len)
         exception_throw_index("vector_insert");
 
     __vector_grow(vector);
@@ -84,20 +84,23 @@ size_t vector_bsearch_nearest_i(vector *v, void *key) {
 }
 
 void *vector_bsearch_nearest(vector *v, void *key) {
-    size_t l = 0;
-    size_t r = v->len - 1;
+    if (v->len == 0)
+        return v->arr;
 
-    int *cmp = NULL;
+    int l = 0;
+    int r = v->len - 1;
+
+    int cmp = 0;
     while (l <= r) {
-        size_t m = l + (r - l) / 2;
+        int m = l + (r - l) / 2;
 
         void *t = v->arr + m * v->smemb;
 
-        *cmp = v->compar(t, key);
+        cmp = v->compar(t, key);
 
-        if (*cmp < 0) {
+        if (cmp < 0) {
             l = m + 1;
-        } else if (*cmp > 0) {
+        } else if (cmp > 0) {
             r = m - 1;
         } else {
             return t;

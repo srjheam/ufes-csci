@@ -22,7 +22,7 @@ Head *index_add(Index *index, size_t i) {
 
     Head *found = vector_bsearch_nearest(index->vector, &head);
     size_t idx = vector_ptrtoindex(index->vector, found);
-    if (i == found->i)
+    if (idx < vector_length(index->vector) && i == found->i)
         return found;
 
     vector_insert(index->vector, &head, idx);

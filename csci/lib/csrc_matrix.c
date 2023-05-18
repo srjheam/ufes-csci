@@ -184,12 +184,12 @@ void csrc_matrix_print_sparse(CsrcMatrix *self) {
 }
 
 void csrc_matrix_print_dense(CsrcMatrix *self) {
-    printf("[");
+    printf("[[");
 
     CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
     for (const double *curr = csrc_matrix_iterator_forward_row_dense(it); curr;
          curr = csrc_matrix_iterator_forward_row_dense(it)) {
-        if (csrc_matrix_iterator_get_j(it) == 0)
+        if (csrc_matrix_iterator_get_j(it) == 0 && csrc_matrix_iterator_get_i(it) != 0)
             printf(" [");
 
         printf("%lf", *curr);

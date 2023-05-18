@@ -21,7 +21,7 @@ LIBDSAAR      = $(LIBDSADIR)/lib$(LIBDSA).a
 # CCompiler - é o compilador usado
 # CFLAGS - são as flags dadas ao compilador durante a compilação
 CC = gcc
-override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I $(INCLUDE) -I$(LIBDSAINCLUDE) -L $(LIBDSADIR)/ -l$(LIBDSA) -lm
+override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(INCLUDE) -I$(LIBDSAINCLUDE) -L$(LIBDSADIR) -l$(LIBDSA) -lm
 
 # ARchive - é o comando arquivador da biblioteca
 # ARFLAGS - são as flags dadas ao arquivador

@@ -22,7 +22,7 @@ VALGRINDOUT   = valgrind-out.txt
 # CCompiler - é o compilador usado
 # CFLAGS    - são as flags dadas ao compilador durante a compilação
 CC = gcc
-override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBDSAINCLUDE) -L $(LIBDSADIR)/ -l$(LIBDSA) -I$(LIBCSCIINCLUDE) -L $(LIBCSCIDIR)/ -l$(LIBCSCI) -lm
+override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBDSAINCLUDE) -I$(LIBCSCIINCLUDE) -lm
 
 # Make - é o GNU Make
 MAKE = make
@@ -31,7 +31,7 @@ all : pre-build build
 
 # Compila o executável e linka as bibliotecas
 main: main.c $(LIBDSAAR) $(LIBCSCIAR)
-	$(CC) -o $@ $<  $(CFLAGS)
+	$(CC) -o $@ $< -L $(LIBCSCIDIR)/ -l$(LIBCSCI) -L $(LIBDSADIR)/ -l$(LIBDSA) $(CFLAGS)
 
 # Chama os submakefiles garantindo a compilação das bibliotecas
 pre-build:
