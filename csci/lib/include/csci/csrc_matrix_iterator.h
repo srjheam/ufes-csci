@@ -11,7 +11,7 @@ size_t csrc_matrix_iterator_get_i(CsrcMatrixIterator *self);
 
 size_t csrc_matrix_iterator_get_j(CsrcMatrixIterator *self);
 
-double csrc_matrix_iterator_forward_row_dense(CsrcMatrixIterator *self);
+double *csrc_matrix_iterator_forward_row_dense(CsrcMatrixIterator *self);
 
 Cell *csrc_matrix_iterator_forward_row_sparse(CsrcMatrixIterator *self);
 

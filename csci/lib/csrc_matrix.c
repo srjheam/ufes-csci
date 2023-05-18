@@ -1,8 +1,10 @@
-#include "assert.h"
+#include <assert.h>
+#include <stdlib.h>
 
 #include "dsa/exceptions.h"
 
 #include "csci/index.h"
+#include "csci/csrc_matrix_iterator.h"
 
 #include "csci/csrc_matrix.h"
 
@@ -172,8 +174,44 @@ void csrc_matrix_set(CsrcMatrix *self, int i, int j, double value) {
     }
 }
 
-void csrc_matrix_print_sparse(CsrcMatrix *self);
+void csrc_matrix_print_sparse(CsrcMatrix *self) {
+    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
+    for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr; curr = csrc_matrix_iterator_forward_row_sparse(it))
+        printf("(%d, %d) = %lf\n", curr->row, curr->col, curr->data);
 
-void csrc_matrix_clear(CsrcMatrix *self);
+    csrv_matrix_iterator_destructor(it);
+}
 
-void csrc_matrix_destructor(CsrcMatrix *self);
+void csrc_matrix_print_dense(CsrcMatrix *self) {
+    printf("[");
+
+    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
+    for (double *curr = csrc_matrix_iterator_forward_row_dense(it); curr; curr = csrc_matrix_iterator_forward_row_dense(it)) {
+        if (csrc_matrix_iterator_get_j(it) == 0)
+            printf("  [");
+        
+        printf("%lf", *curr);
+
+        if (csrc_matrix_iterator_get_j(it) == csrc_matrix_shape_m(self) - 1) {
+            printf("]");
+
+            if (csrc_matrix_iterator_get_i(it) != csrc_matrix_shape_n(self) - 1)
+                printf(",\n");
+        }
+        else
+            printf(", ");
+    }
+
+    csrv_matrix_iterator_destructor(it);
+
+    printf("]");
+}
+
+void csrc_matrix_clear(CsrcMatrix *self) {
+    index_clear(self->rows);
+    index_clear(self->cols);
+}
+
+void csrc_matrix_destructor(CsrcMatrix *self) {
+    csrc_matrix_clear(self);
+}
