@@ -100,8 +100,7 @@ const double *csrc_matrix_iterator_forward_row_dense(CsrcMatrixIterator *self) {
         self->nrow++;
     }
 
-    if (self->next == NULL || self->next->col > self->ncol ||
-        self->next->row > self->nrow)
+    if (self->next == NULL || self->next->row > csrc_matrix_iterator_get_i(self) || self->next->col > csrc_matrix_iterator_get_j(self))
         return val;
 
     self->next = __iterator_forward_row(self);
