@@ -1,6 +1,12 @@
+# build n archive artifacts
 *.o
 *.a
 
+# executables
 main
 
+# valgrind output
 valgrind-out.txt
+
+# binary
+*.bin
