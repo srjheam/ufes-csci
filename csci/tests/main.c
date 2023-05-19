@@ -70,7 +70,19 @@ int main() {
     csrc_matrix_print_sparse(sdouble);
     csrc_matrix_print_sparse(mdouble);
 
+    printf("###### IDENTITY MATRIX ######\n");
+
     CsrcMatrix *id = csrc_matrix_indentity(3);
+
+    csrc_matrix_print_sparse(id);
+
+    printf("###### MATRIX MULTIPLICATION ######\n");
+
+    printf("mat:\n");
+
+    csrc_matrix_print_sparse(mat);
+
+    printf("id:\n");
 
     csrc_matrix_print_sparse(id);
 
@@ -79,10 +91,17 @@ int main() {
     printf("mulmatid == mat: %s\n",
            csrc_matrix_compar(mulmatid, mat) != 0 ? "true" : "false");
 
+    csrc_matrix_print_sparse(mulmatid);
+
+    printf("###### MATRIX DOT PRODUCT ######\n");
+
     CsrcMatrix *dotm = csrc_matrix_dot(mat, mulmatid);
 
-    printf("original matrix:\n");
+    printf("mat:\n");
     csrc_matrix_print_sparse(mat);
+
+    printf("mulmatid:\n");
+    csrc_matrix_print_sparse(mulmatid);
 
     printf("quadratic after dot product:\n");
     csrc_matrix_print_sparse(dotm);
