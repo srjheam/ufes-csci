@@ -163,7 +163,7 @@ void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value) {
             // update col head
             Cell *firstRow = head_first(col);
             if (firstRow == currCol)
-                col->head = firstRow->nextCol;
+                col->head = firstRow->nextRow;
 
             // remove col
             firstRow = head_first(col);
