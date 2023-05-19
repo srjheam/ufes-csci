@@ -1,8 +1,9 @@
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "csci/csrc_matrix.h"
 #include "csci/csrc_matrix_iterator.h"
+#include "csci/csrc_matrix_oper.h"
 #include "csci/csrc_matrix_out.h"
 
 int main() {
@@ -13,7 +14,7 @@ int main() {
     csrc_matrix_print_sparse(mat);
 
     csrc_matrix_print_dense(mat);
-    
+
     csrc_matrix_set(mat, 0, 1, 2);
     csrc_matrix_set(mat, 0, 2, 3);
 
@@ -31,7 +32,7 @@ int main() {
     csrc_matrix_print_sparse(mat);
 
     csrc_matrix_print_dense(mat);
-    
+
     csrc_matrix_set(mat, 0, 1, 0);
     csrc_matrix_set(mat, 1, 0, 0);
     csrc_matrix_set(mat, 2, 2, 0);
@@ -57,8 +58,29 @@ int main() {
     csrc_matrix_print_sparse(mat);
     csrc_matrix_print_sparse(lmat);
 
-    printf("mat == lmat: %s\n", csrc_matrix_compar(mat, lmat) != 0 ? "true" : "false");
+    printf("mat == lmat: %s\n",
+           csrc_matrix_compar(mat, lmat) != 0 ? "true" : "false");
 
+    CsrcMatrix *sdouble = csrc_matrix_add(mat, lmat);
+    CsrcMatrix *mdouble = csrc_matrix_mul_scalar(lmat, 2);
+
+    printf("sdouble == mdouble: %s\n",
+           csrc_matrix_compar(sdouble, mdouble) != 0 ? "true" : "false");
+
+    csrc_matrix_print_sparse(sdouble);
+    csrc_matrix_print_sparse(mdouble);
+
+    CsrcMatrix *id = csrc_matrix_indentity(3);
+
+    csrc_matrix_print_sparse(id);
+
+    CsrcMatrix *mulmatid = csrc_matrix_mul(mat, id);
+
+    printf("mulmatid == mat: %s\n",
+           csrc_matrix_compar(mulmatid, mat) != 0 ? "true" : "false");
+
+    csrc_matrix_destructor(mulmatid);
+    csrc_matrix_destructor(id);
     csrc_matrix_destructor(mat);
     csrc_matrix_destructor(lmat);
 
