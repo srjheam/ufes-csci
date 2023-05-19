@@ -57,18 +57,15 @@ CsrcMatrix *csrc_matrix_mul(CsrcMatrix *self, CsrcMatrix *b) {
     // but CsrcMatrix doesn't save the number of non-zero elements
 
     CsrcMatrixIterator *it = csrc_matrix_iterator_begin(b);
-    for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr;
-         curr = csrc_matrix_iterator_forward_row_sparse(it)) {
-        double self_val = csrc_matrix_get(self, curr->row, curr->col);
-        if (self_val == 0)
-            continue;
+    for (Cell *currB = csrc_matrix_iterator_forward_row_sparse(it); currB;
+         currB = csrc_matrix_iterator_forward_row_sparse(it))
+        for (Cell *currSelf = csrc_matrix_get_col(self, currB->row); currSelf;
+             currSelf = currSelf->nextRow) {
+            double mult = currB->data * currSelf->data;
 
-        double sum_val = curr->data * self_val;
-
-        double curr_val = csrc_matrix_get(result, curr->row, curr->col);
-
-        csrc_matrix_set(result, curr->row, curr->col, curr_val + sum_val);
-    }
+            double curr_val = csrc_matrix_get(result, currSelf->row, currB->col);
+            csrc_matrix_set(result, currSelf->row, currB->col, curr_val + mult);
+        }
 
     csrv_matrix_iterator_destructor(it);
 
@@ -316,8 +313,8 @@ CsrcMatrix *csrc_matrix_convolution(CsrcMatrix *self, CsrcMatrix *kernel) {
 
     CsrcMatrix *result = csrc_matrix_constructor_z(self_shape_n, self_shape_m);
 
-    //size_t kernel_center_i = kernel_shape_n / 2;
-    //size_t kernel_center_j = kernel_shape_m / 2;
+    // size_t kernel_center_i = kernel_shape_n / 2;
+    // size_t kernel_center_j = kernel_shape_m / 2;
 
     // todo
 
