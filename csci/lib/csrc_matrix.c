@@ -56,6 +56,15 @@ CsrcMatrix *csrc_matrix_constructor_z(size_t n, size_t m) {
     return self;
 }
 
+CsrcMatrix *csrc_matrix_indentity(size_t n) {
+    CsrcMatrix *id = csrc_matrix_constructor_z(n, n);
+
+    for (size_t i = 0; i < n; i++)
+        csrc_matrix_set(id, i, i, 1);    
+
+    return id;
+}
+
 double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j) {
     if (i >= self->shape_n || j >= self->shape_m)
         exception_throw_index("csrc_matrix_get");

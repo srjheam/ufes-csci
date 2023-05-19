@@ -7,6 +7,8 @@ typedef struct CsrcMatrix CsrcMatrix;
 
 CsrcMatrix *csrc_matrix_constructor_z(size_t n, size_t m);
 
+CsrcMatrix *csrc_matrix_indentity(size_t n);
+
 void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value);
 
 double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j);
