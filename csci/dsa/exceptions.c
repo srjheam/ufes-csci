@@ -8,6 +8,10 @@ void exception_throw(char *name, char *msg, int code) {
     exit(code);
 }
 
+void exception_throw_argument(char *msg) {
+    exception_throw("ArgumentException", msg, EXIT_FAILURE);
+}
+
 void exception_throw_index(char *msg) {
     exception_throw("IndexException", msg, EXIT_FAILURE);
 }

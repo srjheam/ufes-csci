@@ -5,6 +5,8 @@
 
 void exception_throw(char *name, char *msg, int code);
 
+void exception_throw_argument(char *msg);
+
 void exception_throw_index(char *msg);
 
 void exception_throw_oom(char *msg);
