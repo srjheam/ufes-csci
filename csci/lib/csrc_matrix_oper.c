@@ -102,9 +102,38 @@ CsrcMatrix *csrc_matrix_dot(CsrcMatrix *self, CsrcMatrix *b) {
     return result;
 }
 
+void __row_place_next(Cell *prev, Cell *next) {
+    next->prevRow->nextRow = next->nextRow;
+    next->nextRow->prevRow = next->prevRow;
+
+    next->prevRow = prev;
+
+    Cell *pn = prev->nextRow;
+
+    prev->nextRow = next;
+    if (pn)
+        pn->prevRow = next;
+
+    next->nextRow = pn;
+}
+
+void __row_place_before(Cell *next, Cell *prev) {
+    prev->nextRow->prevRow = prev->prevRow;
+    prev->prevRow->nextRow = prev->nextRow;
+
+    prev->nextRow = next;
+
+    Cell *pn = next->prevRow;
+
+    next->prevRow = prev;
+    if (pn)
+        pn->nextRow = prev;
+
+    prev->prevRow = pn;
+}
+
 CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
     size_t self_shape_n = csrc_matrix_shape_n(self);
-    size_t self_shape_m = csrc_matrix_shape_m(self);
 
     if (i1 >= self_shape_n || i2 >= self_shape_n)
         exception_throw_argument("csrc_matrix_swap_rows");
@@ -120,13 +149,93 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
         i2 = tmp;
     }
 
-    // todo
+    Cell *row1 = csrc_matrix_get_row(result, i1);
+    Cell *row2 = csrc_matrix_get_row(result, i2);
+    while (row1 || row2) {
+        if (row1 && row2 && row1->col == row2->col) {
+            if (i1 + 1 == i2) {
+                row1->nextRow = row2->nextRow;
+                if (row1->nextRow)
+                    row1->nextRow->prevRow = row1;
+
+                row1->prevRow = row2;
+
+                row2->prevRow = row1->prevRow;
+                if (row2->prevRow)
+                    row2->prevRow->nextRow = row2;
+
+                row2->nextRow = row1;
+            } else {
+                Cell *tmp = row1->nextRow;
+
+                row1->nextRow = row2->nextRow;
+                if (row1->nextRow)
+                    row1->nextRow->prevRow = row1;
+
+                row2->nextRow = tmp;
+                row2->nextRow->prevRow = row2;
+
+                tmp = row1->prevRow;
+
+                row1->prevRow = row2->prevRow;
+                row1->prevRow->nextRow = row1;
+
+                row2->prevRow = tmp;
+                if (row2->prevRow)
+                    row2->prevRow->nextRow = row2;
+            }
+
+            row1->row = i2;
+            row1 = row1->nextCol;
+
+            row2->row = i1;
+            row2 = row2->nextCol;
+        } else if ((row1 && row2 && row1->col < row2->col) || (row1 && !row2)) {
+            Cell *prev = row1;
+            while (prev->nextRow && prev->nextRow->row < row2->row)
+                prev = prev->nextRow;
+
+            __row_place_next(prev, row1);
+
+            row1->row = i2;
+            row1 = row1->nextCol;
+        } else {
+            Cell *next = row2;
+            while (next->prevCol && next->prevCol->row > row1->row)
+                next = next->prevRow;
+
+            __row_place_before(next, row2);
+
+            row2->row = i1;
+            row2 = row2->nextCol;
+        }
+    }
+
+    if (i1 == 0) {
+        Index **cols = _csrc_matrix_cols(result);
+        index_destructor(*cols);
+
+        *cols = index_constructor();
+
+        Cell *curr = csrc_matrix_get_row(result, i2);
+        while (curr) {
+            Head *currCol = index_add(*cols, curr->col);
+            currCol->head = curr;
+
+            curr = curr->nextCol;
+        }
+    }
+
+    Index *rows = *_csrc_matrix_rows(result);
+    Head *h1 = index_lookup(rows, i1);
+    Head *h2 = index_lookup(rows, i2);
+    h1->head = h2->head;
+    h2->head = h1->head;
 
     return result;
 }
 
 CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
-    size_t self_shape_n = csrc_matrix_shape_n(self);
     size_t self_shape_m = csrc_matrix_shape_m(self);
 
     if (j1 >= self_shape_m || j2 >= self_shape_m)
@@ -207,8 +316,8 @@ CsrcMatrix *csrc_matrix_convolution(CsrcMatrix *self, CsrcMatrix *kernel) {
 
     CsrcMatrix *result = csrc_matrix_constructor_z(self_shape_n, self_shape_m);
 
-    size_t kernel_center_i = kernel_shape_n / 2;
-    size_t kernel_center_j = kernel_shape_m / 2;
+    //size_t kernel_center_i = kernel_shape_n / 2;
+    //size_t kernel_center_j = kernel_shape_m / 2;
 
     // todo
 

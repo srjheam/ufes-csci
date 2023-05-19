@@ -4,7 +4,6 @@
 #include "dsa/exceptions.h"
 
 #include "csci/csrc_matrix_iterator.h"
-#include "csci/index.h"
 
 #include "csci/csrc_matrix.h"
 
@@ -43,6 +42,10 @@ void __csrc_matrix_set_addfix_cols(CsrcMatrix *self, Cell *cell) {
         currRow->nextRow = cell;
     }
 }
+
+Index **_csrc_matrix_rows(CsrcMatrix *self) { return &self->rows; }
+
+Index **_csrc_matrix_cols(CsrcMatrix *self) { return &self->cols; }
 
 CsrcMatrix *csrc_matrix_constructor_z(size_t n, size_t m) {
     CsrcMatrix *self = malloc(sizeof *self);

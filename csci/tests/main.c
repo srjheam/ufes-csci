@@ -79,6 +79,15 @@ int main() {
     printf("mulmatid == mat: %s\n",
            csrc_matrix_compar(mulmatid, mat) != 0 ? "true" : "false");
 
+    CsrcMatrix *dotm = csrc_matrix_dot(mat, mulmatid);
+
+    printf("original matrix:\n");
+    csrc_matrix_print_sparse(mat);
+
+    printf("quadratic after dot product:\n");
+    csrc_matrix_print_sparse(dotm);
+
+    csrc_matrix_destructor(dotm);
     csrc_matrix_destructor(mulmatid);
     csrc_matrix_destructor(id);
     csrc_matrix_destructor(mat);
