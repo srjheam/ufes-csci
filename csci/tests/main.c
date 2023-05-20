@@ -127,6 +127,43 @@ int main() {
     printf("ttmat == mat: %s\n",
            csrc_matrix_compar(ttmat, mat) != 0 ? "true" : "false");
 
+    printf("###### ROWS SWAP ######\n");
+
+    printf("mat:\n");
+
+    csrc_matrix_print_sparse(mat);
+
+    CsrcMatrix *swamat = csrc_matrix_swap_rows(mat, 0, 2);
+
+    printf("swamat:\n");
+
+    csrc_matrix_print_sparse(swamat);
+
+    CsrcMatrix *swa2mat = csrc_matrix_swap_rows(swamat, 2, 0);
+
+    printf("swa2mat:\n");
+
+    csrc_matrix_print_sparse(swa2mat);
+
+    printf("swa2mat == mat: %s\n",
+           csrc_matrix_compar(swa2mat, mat) != 0 ? "true" : "false");
+
+    printf("###### COLUMNS SWAP ######\n");
+
+    printf("mat:\n");
+
+    csrc_matrix_print_sparse(mat);
+
+    CsrcMatrix *swbmat = csrc_matrix_swap_cols(mat, 0, 2);
+
+    printf("swbmat:\n");
+
+    csrc_matrix_print_sparse(swbmat);
+
+    csrc_matrix_destructor(swamat);
+    csrc_matrix_destructor(swa2mat);
+    csrc_matrix_destructor(swbmat);
+
     csrc_matrix_destructor(ttmat);
     csrc_matrix_destructor(tmat);
 
