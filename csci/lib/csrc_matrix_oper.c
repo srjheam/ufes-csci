@@ -63,7 +63,8 @@ CsrcMatrix *csrc_matrix_mul(CsrcMatrix *self, CsrcMatrix *b) {
              currSelf = currSelf->nextRow) {
             double mult = currB->data * currSelf->data;
 
-            double curr_val = csrc_matrix_get(result, currSelf->row, currB->col);
+            double curr_val =
+                csrc_matrix_get(result, currSelf->row, currB->col);
             csrc_matrix_set(result, currSelf->row, currB->col, curr_val + mult);
         }
 
@@ -100,8 +101,11 @@ CsrcMatrix *csrc_matrix_dot(CsrcMatrix *self, CsrcMatrix *b) {
 }
 
 void __row_place_next(Cell *prev, Cell *next) {
-    next->prevRow->nextRow = next->nextRow;
-    next->nextRow->prevRow = next->prevRow;
+    if (next->prevRow)
+        next->prevRow->nextRow = next->nextRow;
+
+    if (next->nextRow)
+        next->nextRow->prevRow = next->prevRow;
 
     next->prevRow = prev;
 
@@ -115,8 +119,11 @@ void __row_place_next(Cell *prev, Cell *next) {
 }
 
 void __row_place_before(Cell *next, Cell *prev) {
-    prev->nextRow->prevRow = prev->prevRow;
-    prev->prevRow->nextRow = prev->nextRow;
+    if (prev->nextRow)
+        prev->nextRow->prevRow = prev->prevRow;
+
+    if (prev->prevRow)
+        prev->prevRow->nextRow = prev->nextRow;
 
     prev->nextRow = next;
 
@@ -189,7 +196,7 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
             row2 = row2->nextCol;
         } else if ((row1 && row2 && row1->col < row2->col) || (row1 && !row2)) {
             Cell *prev = row1;
-            while (prev->nextRow && prev->nextRow->row < row2->row)
+            while (prev->nextRow && prev->nextRow->row < i2)
                 prev = prev->nextRow;
 
             __row_place_next(prev, row1);
@@ -198,7 +205,7 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
             row1 = row1->nextCol;
         } else {
             Cell *next = row2;
-            while (next->prevCol && next->prevCol->row > row1->row)
+            while (next->prevRow && next->prevRow->row > i1)
                 next = next->prevRow;
 
             __row_place_before(next, row2);
@@ -226,8 +233,9 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
     Index *rows = *_csrc_matrix_rows(result);
     Head *h1 = index_lookup(rows, i1);
     Head *h2 = index_lookup(rows, i2);
+    Cell *tmp = h1->head;
     h1->head = h2->head;
-    h2->head = h1->head;
+    h2->head = tmp;
 
     return result;
 }

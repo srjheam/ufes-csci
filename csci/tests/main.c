@@ -131,19 +131,19 @@ int main() {
 
     printf("mat:\n");
 
-    csrc_matrix_print_sparse(mat);
+    csrc_matrix_print_dense(mat);
 
-    CsrcMatrix *swamat = csrc_matrix_swap_rows(mat, 0, 2);
+    CsrcMatrix *swamat = csrc_matrix_swap_rows(mat, 1, 2);
 
     printf("swamat:\n");
 
-    csrc_matrix_print_sparse(swamat);
+    csrc_matrix_print_dense(swamat);
 
-    CsrcMatrix *swa2mat = csrc_matrix_swap_rows(swamat, 2, 0);
+    CsrcMatrix *swa2mat = csrc_matrix_swap_rows(swamat, 2, 1);
 
     printf("swa2mat:\n");
 
-    csrc_matrix_print_sparse(swa2mat);
+    csrc_matrix_print_dense(swa2mat);
 
     printf("swa2mat == mat: %s\n",
            csrc_matrix_compar(swa2mat, mat) != 0 ? "true" : "false");
