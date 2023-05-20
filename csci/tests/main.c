@@ -152,13 +152,54 @@ int main() {
 
     printf("mat:\n");
 
-    csrc_matrix_print_sparse(mat);
+    csrc_matrix_print_dense(mat);
 
     CsrcMatrix *swbmat = csrc_matrix_swap_cols(mat, 0, 2);
 
     printf("swbmat:\n");
 
-    csrc_matrix_print_sparse(swbmat);
+    csrc_matrix_print_dense(swbmat);
+
+    CsrcMatrix *swb2mat = csrc_matrix_swap_cols(swbmat, 2, 0);
+
+    printf("swb2mat:\n");
+
+    csrc_matrix_print_dense(swb2mat);
+
+    printf("swb2mat == mat: %s\n",
+           csrc_matrix_compar(swb2mat, mat) != 0 ? "true" : "false");
+
+    printf("###### MATRIX SLICE ######\n");
+
+    printf("mat:\n");
+
+    csrc_matrix_print_dense(mat);
+
+    CsrcMatrix *slicemat = csrc_matrix_slice(mat, 1, 0, 2, 2);
+
+    printf("slicemat:\n");
+
+    csrc_matrix_print_dense(slicemat);
+
+    CsrcMatrix *sliceslicemat = csrc_matrix_slice(slicemat, 0, 0, 0, 2);
+
+    printf("sliceslicemat:\n");
+
+    csrc_matrix_print_dense(sliceslicemat);
+
+    CsrcMatrix *lineslicemat = csrc_matrix_slice(mat, 1, 0, 1, 2);
+
+    printf("lineslicemat:\n");
+
+    csrc_matrix_print_dense(lineslicemat);
+
+    printf("lineslicemat == sliceslicemat: %s\n",
+           csrc_matrix_compar(lineslicemat, sliceslicemat) != 0 ? "true"
+                                                                : "false");
+
+    csrc_matrix_destructor(lineslicemat);
+    csrc_matrix_destructor(sliceslicemat);
+    csrc_matrix_destructor(slicemat);
 
     csrc_matrix_destructor(swamat);
     csrc_matrix_destructor(swa2mat);

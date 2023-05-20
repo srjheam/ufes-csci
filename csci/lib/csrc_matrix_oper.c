@@ -240,6 +240,42 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
     return result;
 }
 
+void __col_place_next(Cell *prev, Cell *next) {
+    if (next->prevCol)
+        next->prevCol->nextCol = next->nextCol;
+
+    if (next->nextCol)
+        next->nextCol->prevCol = next->prevCol;
+
+    next->prevCol = prev;
+
+    Cell *pn = prev->nextCol;
+
+    prev->nextCol = next;
+    if (pn)
+        pn->prevCol = next;
+
+    next->nextCol = pn;
+}
+
+void __col_place_before(Cell *next, Cell *prev) {
+    if (prev->nextCol)
+        prev->nextCol->prevCol = prev->prevCol;
+
+    if (prev->prevCol)
+        prev->prevCol->nextCol = prev->nextCol;
+
+    prev->nextCol = next;
+
+    Cell *pn = next->prevCol;
+
+    next->prevCol = prev;
+    if (pn)
+        pn->nextCol = prev;
+
+    prev->prevCol = pn;
+}
+
 CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
     size_t self_shape_m = csrc_matrix_shape_m(self);
 
@@ -257,7 +293,89 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
         j2 = tmp;
     }
 
-    // todo
+    Cell *col1 = csrc_matrix_get_col(result, j1);
+    Cell *col2 = csrc_matrix_get_col(result, j2);
+    while (col1 || col2) {
+        if (col1 && col2 && col1->row == col2->row) {
+            if (j1 + 1 == j2) {
+                col1->nextCol = col2->nextCol;
+                if (col1->nextCol)
+                    col1->nextCol->prevCol = col1;
+
+                col1->prevCol = col2;
+
+                col2->prevCol = col1->prevCol;
+                if (col2->prevCol)
+                    col2->prevCol->nextCol = col2;
+
+                col2->nextCol = col1;
+            } else {
+                Cell *tmp = col1->nextCol;
+
+                col1->nextCol = col2->nextCol;
+                if (col1->nextCol)
+                    col1->nextCol->prevCol = col1;
+
+                col2->nextCol = tmp;
+                col2->nextCol->prevCol = col2;
+
+                tmp = col1->prevCol;
+
+                col1->prevCol = col2->prevCol;
+                col1->prevCol->nextCol = col1;
+
+                col2->prevCol = tmp;
+                if (col2->prevCol)
+                    col2->prevCol->nextCol = col2;
+            }
+
+            col1->col = j2;
+            col1 = col1->nextRow;
+
+            col2->col = j1;
+            col2 = col2->nextRow;
+        } else if ((col1 && col2 && col1->row < col2->row) || (col1 && !col2)) {
+            Cell *prev = col1;
+            while (prev->nextCol && prev->nextCol->col < j2)
+                prev = prev->nextCol;
+
+            __col_place_next(prev, col1);
+
+            col1->col = j2;
+            col1 = col1->nextRow;
+        } else {
+            Cell *next = col2;
+            while (next->prevCol && next->prevCol->col > j1)
+                next = next->prevCol;
+
+            __col_place_before(next, col2);
+
+            col2->col = j1;
+            col2 = col2->nextRow;
+        }
+    }
+
+    if (j1 == 0) {
+        Index **rows = _csrc_matrix_rows(result);
+        index_destructor(*rows);
+
+        *rows = index_constructor();
+
+        Cell *curr = csrc_matrix_get_col(result, j2);
+        while (curr) {
+            Head *currRow = index_add(*rows, curr->row);
+            currRow->head = curr;
+
+            curr = curr->nextRow;
+        }
+    }
+
+    Index *cols = *_csrc_matrix_cols(result);
+    Head *h1 = index_lookup(cols, j1);
+    Head *h2 = index_lookup(cols, j2);
+    Cell *tmp = h1->head;
+    h1->head = h2->head;
+    h2->head = tmp;
 
     return result;
 }
@@ -271,21 +389,32 @@ CsrcMatrix *csrc_matrix_slice(CsrcMatrix *self, size_t i1, size_t j1, size_t i2,
         j2 >= self_shape_m)
         exception_throw_argument("csrc_matrix_slice");
 
-    if (i1 > i2) {
+    if (i1 > i2 || (i1 == i2 && j1 > j2)) {
         size_t tmp = i1;
         i1 = i2;
         i2 = tmp;
-    }
 
-    if (j1 > j2) {
-        size_t tmp = j1;
+        tmp = j1;
         j1 = j2;
         j2 = tmp;
     }
 
-    CsrcMatrix *result = csrc_matrix_constructor_z(i2 - i1, j2 - j1);
+    CsrcMatrix *result = csrc_matrix_constructor_z(i2 - i1 + 1, j2 - j1 + 1);
 
-    // todo
+    Cell *first = csrc_matrix_get_row(self, i1);
+    for (size_t i = i1 + 1; !first && i < self_shape_n; i++)
+        first = csrc_matrix_get_row(self, i);
+
+    while (first && first->row <= i1 && first->col < j1)
+        first = first->nextCol || first->row + 1 == self_shape_n
+                    ? first->nextCol
+                    : csrc_matrix_get_row(self, first->row + 1);
+
+    for (Cell *curr = first; curr && curr->row <= i2 && curr->col <= j2;
+         curr = curr->nextCol || curr->row + 1 == self_shape_n
+                    ? curr->nextCol
+                    : csrc_matrix_get_row(self, curr->row + 1))
+        csrc_matrix_set(result, curr->row - i1, curr->col - j1, curr->data);
 
     return result;
 }
