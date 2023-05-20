@@ -47,6 +47,27 @@ Index **_csrc_matrix_rows(CsrcMatrix *self) { return &self->rows; }
 
 Index **_csrc_matrix_cols(CsrcMatrix *self) { return &self->cols; }
 
+Cell *_csrc_matrix_get_r(CsrcMatrix *self, size_t i, size_t j) {
+    if (i >= self->shape_n || j >= self->shape_m)
+        exception_throw_index("csrc_matrix_get");
+
+    Head *row = index_lookup(self->rows, i);
+    if (!row)
+        return NULL;
+
+    Cell *currCol = head_first(row);
+
+    assert(currCol != NULL);
+
+    while (currCol && currCol->col < j)
+        currCol = currCol->nextCol;
+
+    if (!currCol || currCol->col > j)
+        return NULL;
+
+    return currCol;
+}
+
 CsrcMatrix *csrc_matrix_constructor_z(size_t n, size_t m) {
     CsrcMatrix *self = malloc(sizeof *self);
 
@@ -63,30 +84,14 @@ CsrcMatrix *csrc_matrix_indentity(size_t n) {
     CsrcMatrix *id = csrc_matrix_constructor_z(n, n);
 
     for (size_t i = 0; i < n; i++)
-        csrc_matrix_set(id, i, i, 1);    
+        csrc_matrix_set(id, i, i, 1);
 
     return id;
 }
 
 double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j) {
-    if (i >= self->shape_n || j >= self->shape_m)
-        exception_throw_index("csrc_matrix_get");
-
-    Head *row = index_lookup(self->rows, i);
-    if (!row)
-        return 0;
-
-    Cell *currCol = head_first(row);
-
-    assert(currCol != NULL);
-
-    while (currCol && currCol->col < j)
-        currCol = currCol->nextCol;
-
-    if (!currCol || currCol->col > j)
-        return 0;
-
-    return currCol->data;
+    Cell *cell = _csrc_matrix_get_r(self, i, j);
+    return cell ? cell->data : 0;
 }
 
 Cell *csrc_matrix_get_row(CsrcMatrix *self, size_t i) {

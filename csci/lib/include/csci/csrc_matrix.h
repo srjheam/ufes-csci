@@ -10,6 +10,8 @@ Index **_csrc_matrix_rows(CsrcMatrix *self);
 
 Index **_csrc_matrix_cols(CsrcMatrix *self);
 
+Cell *_csrc_matrix_get_r(CsrcMatrix *self, size_t i, size_t j);
+
 CsrcMatrix *csrc_matrix_constructor_z(size_t n, size_t m);
 
 CsrcMatrix *csrc_matrix_indentity(size_t n);
