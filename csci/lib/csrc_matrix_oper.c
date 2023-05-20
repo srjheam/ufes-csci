@@ -217,16 +217,24 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
 
     if (i1 == 0) {
         Index **cols = _csrc_matrix_cols(result);
-        index_destructor(*cols);
+        Cell *row = csrc_matrix_get_row(result, i2);
+        for (size_t j = 0; j < csrc_matrix_shape_m(result); j++) {
+            Head *currCol = index_lookup(*cols, j);
+            if (!currCol)
+                continue;
 
-        *cols = index_constructor();
+            while (row && row->col < j)
+                row = row->nextCol;
 
-        Cell *curr = csrc_matrix_get_row(result, i2);
-        while (curr) {
-            Head *currCol = index_add(*cols, curr->col);
-            currCol->head = curr;
+            if (row && row->col == j)
+                currCol->head = row;
+            else if (currCol->head->row == i2) {
+                Cell *h = currCol->head;
+                while (h->prevRow)
+                    h = h->prevRow;
 
-            curr = curr->nextCol;
+                currCol->head = h;
+            }
         }
     }
 
@@ -357,16 +365,24 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
 
     if (j1 == 0) {
         Index **rows = _csrc_matrix_rows(result);
-        index_destructor(*rows);
+        Cell *col = csrc_matrix_get_col(result, j2);
+        for (size_t i = 0; i < csrc_matrix_shape_n(result); i++) {
+            Head *currRow = index_lookup(*rows, i);
+            if (!currRow)
+                continue;
 
-        *rows = index_constructor();
+            while (col && col->row < i)
+                col = col->nextRow;
 
-        Cell *curr = csrc_matrix_get_col(result, j2);
-        while (curr) {
-            Head *currRow = index_add(*rows, curr->row);
-            currRow->head = curr;
+            if (col && col->row == i)
+                currRow->head = col;
+            else if (currRow->head->col == j2) {
+                Cell *h = currRow->head;
+                while (h->prevCol)
+                    h = h->prevCol;
 
-            curr = curr->nextRow;
+                currRow->head = h;
+            }
         }
     }
 
