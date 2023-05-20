@@ -106,6 +106,30 @@ int main() {
     printf("quadratic after dot product:\n");
     csrc_matrix_print_sparse(dotm);
 
+    printf("###### MATRIX TRANSPOSE ######\n");
+
+    CsrcMatrix *tmat = csrc_matrix_transpose(mat);
+
+    printf("mat:\n");
+
+    csrc_matrix_print_dense(mat);
+
+    printf("tmat:\n");
+
+    csrc_matrix_print_dense(tmat);
+
+    CsrcMatrix *ttmat = csrc_matrix_transpose(tmat);
+
+    printf("ttmat:\n");
+
+    csrc_matrix_print_dense(ttmat);
+
+    printf("ttmat == mat: %s\n",
+           csrc_matrix_compar(ttmat, mat) != 0 ? "true" : "false");
+
+    csrc_matrix_destructor(ttmat);
+    csrc_matrix_destructor(tmat);
+
     csrc_matrix_destructor(dotm);
     csrc_matrix_destructor(mulmatid);
     csrc_matrix_destructor(id);
