@@ -5,7 +5,7 @@
             "name": "Debug tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/csci/tests/main",
+            "program": "${workspaceFolder}/csci/tests/${fileDirnameBasename}/main",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/csci/tests",
