@@ -49,7 +49,7 @@ Onde,
 - `-m` é a flag para executar o teste com o Valgrind
 
 ```sh
-sh test.sh -e convolution_test -m 0
+sh run-test.sh -e convolution_test -m 0
 ```
 
 Onde,
@@ -70,6 +70,10 @@ Os scripts de teste recebem a flag `-m` para executar o teste com o Valgrind.
 ```sh
 sh test-all.sh -m 1
 ```
+
+O log do Valgrind é salvo no arquivo `valgrind-out.txt`.
+
+Caso um leak seja detectado, o teste falha e seus resultados são reportados na saída.
 
 ## Suporte
 
