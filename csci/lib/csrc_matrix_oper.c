@@ -417,21 +417,6 @@ CsrcMatrix *csrc_matrix_slice(CsrcMatrix *self, size_t i1, size_t j1, size_t i2,
 
     CsrcMatrix *result = csrc_matrix_constructor_z(i2 - i1 + 1, j2 - j1 + 1);
 
-    /* Cell *first = csrc_matrix_get_row(self, i1);
-    for (size_t i = i1 + 1; !first && i < self_shape_n; i++)
-        first = csrc_matrix_get_row(self, i);
-
-    while (first && first->row <= i1 && first->col < j1)
-        first = first->nextCol || first->row + 1 == self_shape_n
-                    ? first->nextCol
-                    : csrc_matrix_get_row(self, first->row + 1);
-
-    for (Cell *curr = first; curr && curr->row <= i2 && curr->col <= j2;
-         curr = curr->nextCol || curr->row + 1 == self_shape_n
-                    ? curr->nextCol
-                    : csrc_matrix_get_row(self, curr->row + 1))
-        csrc_matrix_set(result, curr->row - i1, curr->col - j1, curr->data); */
-
     CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
     for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it);
          // mapa de carnô ((my beloved))
@@ -443,6 +428,8 @@ CsrcMatrix *csrc_matrix_slice(CsrcMatrix *self, size_t i1, size_t j1, size_t i2,
             continue;
         else if (curr->row >= i1 && curr->col >= j1)
             csrc_matrix_set(result, curr->row - i1, curr->col - j1, curr->data);
+
+    csrv_matrix_iterator_destructor(it);
 
     return result;
 }
@@ -551,6 +538,8 @@ CsrcMatrix *csrc_matrix_convolution(CsrcMatrix *self, CsrcMatrix *kernel) {
             }
         }
     }
+
+    csrv_matrix_iterator_destructor(it);
 
     return result;
 }
