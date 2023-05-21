@@ -246,11 +246,13 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
     Head *h2 = index_lookup(rows, i2);
     if (!h1) {
         h1 = index_add(rows, i1);
+        h2 = index_lookup(rows, i2);
         h1->head = h2->head;
         h2->head = NULL;
         index_remove(rows, i2);
     } else if (!h2) {
         h2 = index_add(rows, i2);
+        h1 = index_lookup(rows, i1);
         h2->head = h1->head;
         h1->head = NULL;
         index_remove(rows, i1);
@@ -405,15 +407,24 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
     }
 
     Index *cols = *_csrc_matrix_cols(result);
+
+    // aqui eu aprendi que passar ponteiros de elementos de vetores contíguos na
+    // memória, sem ser ponteiros mesmo, é perigoso para um caralho
+    // o ponteiro que você recebe se corrompe (entra em dessincronia com o valor
+    // esperado) silenciosamente assim que qualquer mutação é feita no array
+    // (index_add)
+
     Head *h1 = index_lookup(cols, j1);
     Head *h2 = index_lookup(cols, j2);
     if (!h1) {
         h1 = index_add(cols, j1);
+        h2 = index_lookup(cols, j2);
         h1->head = h2->head;
         h2->head = NULL;
         index_remove(cols, j2);
     } else if (!h2) {
         h2 = index_add(cols, j2);
+        h1 = index_lookup(cols, j1);
         h2->head = h1->head;
         h1->head = NULL;
         index_remove(cols, j1);
