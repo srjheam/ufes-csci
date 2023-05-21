@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 NC='\033[0m'
 CYAN='\033[0;36m'
@@ -47,8 +46,6 @@ do
     echo -n "#$NTEST"
     OUT=`$TARGET < $INPUT`
     DIFF=`echo "$OUT" | diff $EXPECTED -`
-
-    echo $EXPECTED
 
     if [ -z "${DIFF}" ]
     then
