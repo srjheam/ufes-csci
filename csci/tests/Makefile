@@ -1,10 +1,8 @@
-# Makefile que percorre todo a biblioteca, procurando todos os códigos fontes .c para compilar
+ifndef TEST
+$(error TEST is not set)
+endif
 
-# INCLUDE        - é o diretório que contém os headers
-# BUILDIR        - é o diretório onde estarão os binários
-# LIBDSADIR   - é o diretório para a biblioteca de tipos comuns.
-# LIBDSA      - é a biblioteca de tipos comuns.
-INCLUDE          = .
+BASE_DIR = 
 
 LIBDSADIR     = ../dsa
 LIBDSAINCLUDE = $(LIBDSADIR)/include
@@ -16,8 +14,8 @@ LIBCSCIINCLUDE = $(LIBCSCIDIR)/include
 LIBCSCI        = csci
 LIBCSCIAR      = $(LIBCSCIDIR)/lib$(LIBCSCI).a
 
-MAIN          = main
-VALGRINDOUT   = valgrind-out.txt
+MAIN          = $(TEST)/main
+VALGRINDOUT   = $(TEST)/valgrind-out.txt
 
 # CCompiler - é o compilador usado
 # CFLAGS    - são as flags dadas ao compilador durante a compilação
@@ -28,10 +26,11 @@ override CFLAGS += -Wall -Wall -Wextra -Werror -pedantic -ggdb3 -I$(LIBDSAINCLUD
 MAKE = make
 
 all : pre-build build
+	echo $(shell pwd)
 
 # Compila o executável e linka as bibliotecas
-main: main.c $(LIBDSAAR) $(LIBCSCIAR)
-	$(CC) -o $@ $< -L $(LIBCSCIDIR)/ -l$(LIBCSCI) -L $(LIBDSADIR)/ -l$(LIBDSA) $(CFLAGS)
+main: $(LIBDSAAR) $(LIBCSCIAR)
+	$(CC) -o $(MAIN) $(TEST)/main.c -L $(LIBCSCIDIR)/ -l$(LIBCSCI) -L $(LIBDSADIR)/ -l$(LIBDSA) $(CFLAGS)
 
 # Chama os submakefiles garantindo a compilação das bibliotecas
 pre-build:
