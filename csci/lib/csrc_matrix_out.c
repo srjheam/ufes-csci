@@ -10,7 +10,7 @@ void csrc_matrix_print_sparse(CsrcMatrix *self) {
     CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
     for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr;
          curr = csrc_matrix_iterator_forward_row_sparse(it))
-        printf("(%ld, %ld) = %.2f\n", curr->row, curr->col, curr->data);
+        printf("(%lu, %lu) = %.2f\n", curr->row, curr->col, curr->data);
 
     csrv_matrix_iterator_destructor(it);
 }
@@ -120,6 +120,22 @@ CsrcMatrix *csrc_matrix_load(char *path) {
     }
 
     fclose(fbin);
+
+    return self;
+}
+
+CsrcMatrix *csrc_matrix_read() {
+    size_t shape_n;
+    size_t shape_m;
+    scanf("%lu %lu", &shape_n, &shape_m);
+
+    CsrcMatrix *self = csrc_matrix_constructor_z(shape_n, shape_m);
+
+    size_t row;
+    size_t col;
+    double data;
+    while (scanf("%lu %lu %lf", &row, &col, &data) == 3)
+        csrc_matrix_set(self, row, col, data);
 
     return self;
 }
