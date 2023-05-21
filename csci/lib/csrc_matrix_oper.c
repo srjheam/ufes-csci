@@ -155,6 +155,9 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
 
     Cell *row1 = csrc_matrix_get_row(result, i1);
     Cell *row2 = csrc_matrix_get_row(result, i2);
+    if (!row1 && !row2)
+        return result;
+
     while (row1 || row2) {
         if (row1 && row2 && row1->col == row2->col) {
             if (i1 + 1 == i2) {
@@ -162,9 +165,9 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
                 if (row1->nextRow)
                     row1->nextRow->prevRow = row1;
 
+                Cell *tmp = row1->nextRow;
                 row1->prevRow = row2;
-
-                row2->prevRow = row1->prevRow;
+                row2->prevRow = tmp;
                 if (row2->prevRow)
                     row2->prevRow->nextRow = row2;
 
@@ -199,7 +202,8 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
             while (prev->nextRow && prev->nextRow->row < i2)
                 prev = prev->nextRow;
 
-            __row_place_next(prev, row1);
+            if (row1 != prev)
+                __row_place_next(prev, row1);
 
             row1->row = i2;
             row1 = row1->nextCol;
@@ -208,42 +212,53 @@ CsrcMatrix *csrc_matrix_swap_rows(CsrcMatrix *self, size_t i1, size_t i2) {
             while (next->prevRow && next->prevRow->row > i1)
                 next = next->prevRow;
 
-            __row_place_before(next, row2);
+            if (row2 != next)
+                __row_place_before(next, row2);
 
             row2->row = i1;
             row2 = row2->nextCol;
         }
     }
 
-    if (i1 == 0) {
-        Index **cols = _csrc_matrix_cols(result);
-        Cell *row = csrc_matrix_get_row(result, i2);
-        for (size_t j = 0; j < csrc_matrix_shape_m(result); j++) {
-            Head *currCol = index_lookup(*cols, j);
-            if (!currCol)
-                continue;
+    Index **cols = _csrc_matrix_cols(result);
+    Cell *row = csrc_matrix_get_row(result, i2);
+    for (size_t j = 0; j < csrc_matrix_shape_m(result); j++) {
+        Head *currCol = index_lookup(*cols, j);
+        if (!currCol)
+            continue;
 
-            while (row && row->col < j)
-                row = row->nextCol;
+        while (row && row->col < j)
+            row = row->nextCol;
 
-            if (row && row->col == j)
-                currCol->head = row;
-            else if (currCol->head->row == i2) {
-                Cell *h = currCol->head;
-                while (h->prevRow)
-                    h = h->prevRow;
+        if (row && row->col == j)
+            currCol->head = row;
+        else if (currCol->head->row == i2) {
+            Cell *h = currCol->head;
+            while (h->prevRow)
+                h = h->prevRow;
 
-                currCol->head = h;
-            }
+            currCol->head = h;
         }
     }
 
     Index *rows = *_csrc_matrix_rows(result);
     Head *h1 = index_lookup(rows, i1);
     Head *h2 = index_lookup(rows, i2);
-    Cell *tmp = h1->head;
-    h1->head = h2->head;
-    h2->head = tmp;
+    if (!h1) {
+        h1 = index_add(rows, i1);
+        h1->head = h2->head;
+        h2->head = NULL;
+        index_remove(rows, i2);
+    } else if (!h2) {
+        h2 = index_add(rows, i2);
+        h2->head = h1->head;
+        h1->head = NULL;
+        index_remove(rows, i1);
+    } else {
+        Cell *tmp = h1->head;
+        h1->head = h2->head;
+        h2->head = tmp;
+    }
 
     return result;
 }
@@ -303,6 +318,9 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
 
     Cell *col1 = csrc_matrix_get_col(result, j1);
     Cell *col2 = csrc_matrix_get_col(result, j2);
+    if (!col1 && !col2)
+        return result;
+
     while (col1 || col2) {
         if (col1 && col2 && col1->row == col2->row) {
             if (j1 + 1 == j2) {
@@ -310,9 +328,9 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
                 if (col1->nextCol)
                     col1->nextCol->prevCol = col1;
 
+                Cell *tmp = col1->prevCol;
                 col1->prevCol = col2;
-
-                col2->prevCol = col1->prevCol;
+                col2->prevCol = tmp;
                 if (col2->prevCol)
                     col2->prevCol->nextCol = col2;
 
@@ -347,7 +365,8 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
             while (prev->nextCol && prev->nextCol->col < j2)
                 prev = prev->nextCol;
 
-            __col_place_next(prev, col1);
+            if (col1 != prev)
+                __col_place_next(prev, col1);
 
             col1->col = j2;
             col1 = col1->nextRow;
@@ -356,42 +375,53 @@ CsrcMatrix *csrc_matrix_swap_cols(CsrcMatrix *self, size_t j1, size_t j2) {
             while (next->prevCol && next->prevCol->col > j1)
                 next = next->prevCol;
 
-            __col_place_before(next, col2);
+            if (col2 != next)
+                __col_place_before(next, col2);
 
             col2->col = j1;
             col2 = col2->nextRow;
         }
     }
 
-    if (j1 == 0) {
-        Index **rows = _csrc_matrix_rows(result);
-        Cell *col = csrc_matrix_get_col(result, j2);
-        for (size_t i = 0; i < csrc_matrix_shape_n(result); i++) {
-            Head *currRow = index_lookup(*rows, i);
-            if (!currRow)
-                continue;
+    Index **rows = _csrc_matrix_rows(result);
+    Cell *col = csrc_matrix_get_col(result, j2);
+    for (size_t i = 0; i < csrc_matrix_shape_n(result); i++) {
+        Head *currRow = index_lookup(*rows, i);
+        if (!currRow)
+            continue;
 
-            while (col && col->row < i)
-                col = col->nextRow;
+        while (col && col->row < i)
+            col = col->nextRow;
 
-            if (col && col->row == i)
-                currRow->head = col;
-            else if (currRow->head->col == j2) {
-                Cell *h = currRow->head;
-                while (h->prevCol)
-                    h = h->prevCol;
+        if (col && col->row == i)
+            currRow->head = col;
+        else if (currRow->head->col == j2) {
+            Cell *h = currRow->head;
+            while (h->prevCol)
+                h = h->prevCol;
 
-                currRow->head = h;
-            }
+            currRow->head = h;
         }
     }
 
     Index *cols = *_csrc_matrix_cols(result);
     Head *h1 = index_lookup(cols, j1);
     Head *h2 = index_lookup(cols, j2);
-    Cell *tmp = h1->head;
-    h1->head = h2->head;
-    h2->head = tmp;
+    if (!h1) {
+        h1 = index_add(cols, j1);
+        h1->head = h2->head;
+        h2->head = NULL;
+        index_remove(cols, j2);
+    } else if (!h2) {
+        h2 = index_add(cols, j2);
+        h2->head = h1->head;
+        h1->head = NULL;
+        index_remove(cols, j1);
+    } else {
+        Cell *tmp = h1->head;
+        h1->head = h2->head;
+        h2->head = tmp;
+    }
 
     return result;
 }
