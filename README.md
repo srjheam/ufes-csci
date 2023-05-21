@@ -13,7 +13,6 @@ Csci foi o primeiro trabalho desenvolvido ao longo da disciplina de Estrutura de
 - Linux (sem suporte pro windows, sra. microsoft)
 - [GNU Compiler Collection](https://gcc.gnu.org/)
 - [GNU Make](https://www.gnu.org/software/make/)
-- [Python 3](https://www.python.org/)
 
 ### Instalando
 
