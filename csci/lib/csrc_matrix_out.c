@@ -129,12 +129,16 @@ CsrcMatrix *csrc_matrix_read() {
     size_t shape_m;
     scanf("%lu %lu", &shape_n, &shape_m);
 
+    size_t in;
+    scanf("%lu", &in);
+
     CsrcMatrix *self = csrc_matrix_constructor_z(shape_n, shape_m);
 
     size_t row;
     size_t col;
     double data;
-    while (scanf("%lu %lu %lf", &row, &col, &data) == 3)
+    for (size_t i = 0; i < in && scanf("%lu %lu %lf", &row, &col, &data) == 3;
+         i++)
         csrc_matrix_set(self, row, col, data);
 
     return self;
