@@ -3,7 +3,7 @@
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 [-m]"
+   echo "Usage: $0 -m"
    echo -e "\t-m Run with valgrind, 1 for true, 0 for false"
    exit 1
 }

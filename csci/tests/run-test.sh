@@ -9,7 +9,7 @@ LIGHT_GREEN='\033[1;32m'
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 -e <test> [-m]"
+   echo "Usage: $0 -e <test> -m"
    echo -e "\t-e Test directory name (e.g. dot_test)"
    echo -e "\t-m Run with valgrind, 1 for true, 0 for false"
    exit 1
