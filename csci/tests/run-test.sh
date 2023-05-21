@@ -69,7 +69,17 @@ do
     then
         echo " ${LIGHT_GREEN}OK${NC}"
     else
-        echo " ${RED}WA${NC}"
+        if [ "${DIFF}" ];
+        then
+            echo -n " ${RED}WA${NC}"
+        fi
+
+        if [ "${VAL_OUT}" != "0" ];
+        then
+            echo -n " ${RED}LEAK${NC}"
+        fi
+
+        echo ""
 
         echo "${YELLOW}Input${NC}"
         cat $INPUT
@@ -88,19 +98,13 @@ do
             echo "${YELLOW}Diff${NC}"
             echo $DIFF
             echo ""
-        else
-            echo "${YELLOW}Expected${NC}"
-            echo ""
-
-            echo "${YELLOW}Diff${NC}"
-            echo ""
         fi
 
         if [ $VALGRIND -eq 1 ] && [ $VAL_OUT -ne 0 ]
         then
             echo "${YELLOW}Valgrind${NC}"
             echo "Leaks detected!"
-            echo "Head to ${TEST_DIR}valgrind-out.txt"
+            echo "Head to ${TEST_DIR}/valgrind-out.txt"
             echo ""
         fi
         break
