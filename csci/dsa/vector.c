@@ -2,7 +2,7 @@
 
 #include "dsa/vector.h"
 
-#define VECTOR_INITIAL_SIZE 16
+#define VECTOR_INITIAL_SIZE 2
 #define VECTOR_GROWTH_FACTOR 2
 
 void __vector_resize(vector *vector, size_t nsize) {

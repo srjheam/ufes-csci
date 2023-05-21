@@ -94,14 +94,6 @@ double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j) {
     return cell ? cell->data : 0;
 }
 
-double csrc_matrix_get_or_default(CsrcMatrix *self, size_t i, size_t j,
-                                  double dft) {
-    if (i >= self->shape_n || j >= self->shape_m)
-        return dft;
-
-    return csrc_matrix_get(self, i, j);
-}
-
 Cell *csrc_matrix_get_row(CsrcMatrix *self, size_t i) {
     if (i >= self->shape_n)
         exception_throw_index("csrc_matrix_get_row");
