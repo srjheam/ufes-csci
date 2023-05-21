@@ -11,4 +11,6 @@ void csrc_matrix_save(CsrcMatrix *self, char *path);
 
 CsrcMatrix *csrc_matrix_load(char *path);
 
+CsrcMatrix *csrc_matrix_read();
+
 #endif
