@@ -417,7 +417,7 @@ CsrcMatrix *csrc_matrix_slice(CsrcMatrix *self, size_t i1, size_t j1, size_t i2,
 
     CsrcMatrix *result = csrc_matrix_constructor_z(i2 - i1 + 1, j2 - j1 + 1);
 
-    Cell *first = csrc_matrix_get_row(self, i1);
+    /* Cell *first = csrc_matrix_get_row(self, i1);
     for (size_t i = i1 + 1; !first && i < self_shape_n; i++)
         first = csrc_matrix_get_row(self, i);
 
@@ -430,7 +430,19 @@ CsrcMatrix *csrc_matrix_slice(CsrcMatrix *self, size_t i1, size_t j1, size_t i2,
          curr = curr->nextCol || curr->row + 1 == self_shape_n
                     ? curr->nextCol
                     : csrc_matrix_get_row(self, curr->row + 1))
-        csrc_matrix_set(result, curr->row - i1, curr->col - j1, curr->data);
+        csrc_matrix_set(result, curr->row - i1, curr->col - j1, curr->data); */
+
+    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
+    for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it);
+         // mapa de carnô ((my beloved))
+         (curr && curr->row <= i2 && curr->row != i2) ||
+         (curr && curr->row <= i2 && curr->col <= j2);
+         // he got my back on this one
+         curr = csrc_matrix_iterator_forward_row_sparse(it))
+        if (curr->col > j2)
+            continue;
+        else if (curr->row >= i1 && curr->col >= j1)
+            csrc_matrix_set(result, curr->row - i1, curr->col - j1, curr->data);
 
     return result;
 }
@@ -445,6 +457,46 @@ CsrcMatrix *csrc_matrix_transpose(CsrcMatrix *self) {
     for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr;
          curr = csrc_matrix_iterator_forward_row_sparse(it))
         csrc_matrix_set(result, curr->col, curr->row, curr->data);
+
+    csrv_matrix_iterator_destructor(it);
+
+    return result;
+}
+
+double __kernel_dot(CsrcMatrix *self, CsrcMatrix *kernel, size_t kci,
+                    size_t kcj) {
+    double result = 0.0;
+
+    size_t self_shape_n = csrc_matrix_shape_n(self);
+    size_t self_shape_m = csrc_matrix_shape_m(self);
+
+    size_t kernel_shape_n = csrc_matrix_shape_n(kernel);
+    size_t kernel_shape_m = csrc_matrix_shape_m(kernel);
+
+    size_t kernel_center_i = kernel_shape_n / 2;
+    size_t kernel_center_j = kernel_shape_m / 2;
+
+    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(kernel);
+    for (Cell *kcurr = csrc_matrix_iterator_forward_row_sparse(it); kcurr;
+         kcurr = csrc_matrix_iterator_forward_row_sparse(it)) {
+        if (kcurr->row + kci < kernel_center_i)
+            continue;
+
+        size_t s_target_i = kcurr->row + kci - kernel_center_i;
+        if (s_target_i >= self_shape_n)
+            break;
+
+        if (kcurr->col + kcj < kernel_center_j)
+            continue;
+
+        size_t s_target_j = kcurr->col + kcj - kernel_center_j;
+        if (s_target_j >= self_shape_m)
+            break;
+
+        double scurr_value = csrc_matrix_get(self, s_target_i, s_target_j);
+
+        result += kcurr->data * scurr_value;
+    }
 
     csrv_matrix_iterator_destructor(it);
 
@@ -466,10 +518,39 @@ CsrcMatrix *csrc_matrix_convolution(CsrcMatrix *self, CsrcMatrix *kernel) {
 
     CsrcMatrix *result = csrc_matrix_constructor_z(self_shape_n, self_shape_m);
 
-    // size_t kernel_center_i = kernel_shape_n / 2;
-    // size_t kernel_center_j = kernel_shape_m / 2;
+    size_t kernel_center_i = kernel_shape_n / 2;
+    size_t kernel_center_j = kernel_shape_m / 2;
 
-    // todo
+    CsrcMatrixIterator *it = csrc_matrix_iterator_begin(self);
+    for (Cell *curr = csrc_matrix_iterator_forward_row_sparse(it); curr;
+         curr = csrc_matrix_iterator_forward_row_sparse(it)) {
+        for (size_t ki = 0; ki < kernel_shape_n; ki++) {
+            if (curr->row + ki < kernel_center_i)
+                continue;
+
+            size_t k_target_i = curr->row + ki - kernel_center_i;
+            if (k_target_i >= self_shape_n)
+                break;
+
+            for (size_t kj = 0; kj < kernel_shape_m; kj++) {
+                if (curr->col + kj < kernel_center_j)
+                    continue;
+
+                size_t k_target_j = curr->col + kj - kernel_center_j;
+                if (k_target_j >= self_shape_m)
+                    break;
+
+                double k_target_curr_value =
+                    csrc_matrix_get(result, k_target_i, k_target_j);
+                if (k_target_curr_value != 0)
+                    continue;
+
+                csrc_matrix_set(
+                    result, k_target_i, k_target_j,
+                    __kernel_dot(self, kernel, k_target_i, k_target_j));
+            }
+        }
+    }
 
     return result;
 }

@@ -20,6 +20,8 @@ void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value);
 
 double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j);
 
+double csrc_matrix_get_or_default(CsrcMatrix *self, size_t i, size_t j, double dft);
+
 Cell *csrc_matrix_get_row(CsrcMatrix *self, size_t i);
 
 Cell *csrc_matrix_get_col(CsrcMatrix *self, size_t j);

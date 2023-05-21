@@ -94,6 +94,14 @@ double csrc_matrix_get(CsrcMatrix *self, size_t i, size_t j) {
     return cell ? cell->data : 0;
 }
 
+double csrc_matrix_get_or_default(CsrcMatrix *self, size_t i, size_t j,
+                                  double dft) {
+    if (i >= self->shape_n || j >= self->shape_m)
+        return dft;
+
+    return csrc_matrix_get(self, i, j);
+}
+
 Cell *csrc_matrix_get_row(CsrcMatrix *self, size_t i) {
     if (i >= self->shape_n)
         exception_throw_index("csrc_matrix_get_row");
@@ -144,9 +152,6 @@ void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value) {
     while (currCol->nextCol && currCol->nextCol->col <= j)
         currCol = currCol->nextCol;
 
-    if (currCol->col < j && value == 0)
-        return;
-
     if (currCol->col == j) {
         if (value == 0) {
             cell_remove(currCol);
@@ -182,12 +187,27 @@ void csrc_matrix_set(CsrcMatrix *self, size_t i, size_t j, double value) {
 
         currCol->data = value;
     } else {
+        if (value == 0)
+            return;
+
         Cell *ncell = cell_constructor(i, j, value);
 
-        ncell->prevCol = currCol;
-        ncell->nextCol = currCol->nextCol;
+        if (currCol->col > j) {
+            ncell->nextCol = currCol;
+            ncell->prevCol = currCol->prevCol;
 
-        currCol->nextCol = ncell;
+            currCol->prevCol = ncell;
+
+            if (ncell->prevCol)
+                ncell->prevCol->nextCol = ncell;
+            else
+                row->head = ncell;
+        } else {
+            ncell->prevCol = currCol;
+            ncell->nextCol = currCol->nextCol;
+
+            currCol->nextCol = ncell;
+        }
 
         __csrc_matrix_set_addfix_cols(self, ncell);
     }
