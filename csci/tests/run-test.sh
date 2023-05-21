@@ -50,6 +50,8 @@ do
     echo -n "#$NTEST"
     OUT=`$TARGET < $INPUT`
     DIFF=`echo "$OUT" | diff $EXPECTED -`
+
+    VAL_OUT=0
     if [ $VALGRIND -eq 1 ]
     then        
         (valgrind --leak-check=full \
@@ -63,7 +65,7 @@ do
          VAL_OUT=$?
     fi
 
-    if [ -z "${DIFF}" ] && [ $VAL_OUT -eq 0 ]
+    if [ -z "${DIFF}" ] && [ "${VAL_OUT}" = "0" ];
     then
         echo " ${LIGHT_GREEN}OK${NC}"
     else
