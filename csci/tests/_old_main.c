@@ -330,6 +330,8 @@ int main() {
     printf("sliceconv == slicetarget: %s\n",
            csrc_matrix_compar(sliceconv, slicetarget) ? "true" : "false");
 
+    csrc_matrix_destructor(slicetarget);
+
     csrc_matrix_destructor(sliceconv);
     csrc_matrix_destructor(convsconv);
     csrc_matrix_destructor(kernel);
@@ -341,12 +343,15 @@ int main() {
 
     csrc_matrix_destructor(swamat);
     csrc_matrix_destructor(swa2mat);
+    csrc_matrix_destructor(swb2mat);
     csrc_matrix_destructor(swbmat);
 
     csrc_matrix_destructor(ttmat);
     csrc_matrix_destructor(tmat);
 
     csrc_matrix_destructor(dotm);
+    csrc_matrix_destructor(sdouble);
+    csrc_matrix_destructor(mdouble);
     csrc_matrix_destructor(mulmatid);
     csrc_matrix_destructor(id);
     csrc_matrix_destructor(mat);
